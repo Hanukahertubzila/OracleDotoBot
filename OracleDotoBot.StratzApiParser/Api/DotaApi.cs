@@ -1,4 +1,6 @@
 ﻿using OracleDotoBot.StratzApiParser.Client;
+using OracleDotoBot.StratzApiParser.OutputDataTypes;
+using OracleDotoBot.StratzApiParser.Parsers;
 using OracleDotoBot.StratzApiParser.Response_Object_Models;
 
 namespace OracleDotoBot.StratzApiParser.Api
@@ -12,13 +14,13 @@ namespace OracleDotoBot.StratzApiParser.Api
 
         private ApiClient _client;
 
-        public async Task<MatchUpStatisticsResponse> GetMatchUpStatistics(int[] heroIds)
+        public async Task<(List<HeroStatistics> stats, string error)> GetMatchUpStatistics(List<int> heroIds)
         {
             var idsString = "[";
-            for (int i = 0; i < heroIds.Length; i++)
+            for (int i = 0; i < heroIds.Count; i++)
             {
                 idsString += heroIds[i];
-                if (i == heroIds.Length - 1)
+                if (i == heroIds.Count - 1)
                     idsString += "]";
                 else
                     idsString += ",";
@@ -26,7 +28,7 @@ namespace OracleDotoBot.StratzApiParser.Api
             string query = $@"
                 {{
                   heroStats {{
-		                matchUp(heroIds: {idsString} take: 140 bracketBasicIds: DIVINE_IMMORTAL){{
+		                matchUp(heroIds: {idsString} take: 10000 bracketBasicIds: DIVINE_IMMORTAL){{
      	                vs {{
                         heroId1
                         heroId2
@@ -47,7 +49,11 @@ namespace OracleDotoBot.StratzApiParser.Api
             ";
 
             var response = await _client.Request<MatchUpStatisticsResponse>(query);
-            return response.data;
+            if (!string.IsNullOrEmpty(response.error))
+                return (new List<HeroStatistics>(), response.error);
+            
+            var stats = ToHeroStatisticsCoverter.Covert(response.data, heroIds);
+            return (stats, "");
         }
     }
 }

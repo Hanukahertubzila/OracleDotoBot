@@ -12,8 +12,8 @@ namespace OracleDotoBot.StratzApiParser.OutputDataTypes
 
         public double WinRate { get; set; }
 
-        public List<double> WinsVs {  get; set; } = new List<double>();
+        public double WinsVs {  get; set; } 
 
-        public List<double> WinsWith { get; set; } = new List<double>();
+        public double WinsWith { get; set; } 
     }
 }
