@@ -8,10 +8,13 @@ using Telegram.Bot;
 
 public class Program
 {
-    private static async Task Main(string[] args)
+    private static async Task Main()
     {
         var builder = new ConfigurationBuilder();
         BuildConfig(builder);
+        var config = builder
+            .AddUserSecrets<Program>()
+            .Build();
 
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Build())
@@ -25,7 +28,7 @@ public class Program
             .ConfigureServices((context, services) =>
             {
                 services.AddSingleton<ITelegramBotClient>(
-                    x => new TelegramBotClient(context.Configuration.GetValue<string>("Token")));
+                    x => new TelegramBotClient(config["Token"]));
                 services.AddTransient<IResponseService, ResponseService>();
                 services.AddHostedService<MessagesRecieverService>();
             })
