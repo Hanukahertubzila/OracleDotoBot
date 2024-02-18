@@ -25,6 +25,25 @@ namespace OracleDotoBot.Services
         private readonly IResponseService _responseService;
         private readonly ILogger<MessagesRecieverService> _logger;
 
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            var receiverOptions = new ReceiverOptions()
+            {
+                AllowedUpdates = new[]
+    {
+                UpdateType.Message
+            },
+                ThrowPendingUpdates = true
+            };
+            using var cts = new CancellationTokenSource();
+            _client.StartReceiving(UpdateHandler, ErrorHandler, receiverOptions, cts.Token);
+            var me = await _client.GetMeAsync();
+            _logger.LogInformation(me.Username + " started!");
+
+            Console.ReadLine();
+            cts.Cancel();
+        }
+
         private async Task UpdateHandler(ITelegramBotClient client, Update update, CancellationToken cts)
         {
             try
@@ -32,17 +51,14 @@ namespace OracleDotoBot.Services
                 switch (update.Type)
                 {
                     case UpdateType.Message:
-                        {
-                            var message = update.Message;
-                            var chat = message.Chat;
+                        var message = update.Message;
+                        var chat = message.Chat;
 
-                            _logger.LogInformation("Message recieved! [" + message.Text + "]");
+                        _logger.LogInformation("Message recieved! [" + message.Text + "]");
 
-                            var (responseText, replyMarkup) = _responseService.GetResponse(message.Text);
-
-                            await _client.SendTextMessageAsync(chat.Id, responseText, replyMarkup: replyMarkup);
-                            return;
-                        }
+                        var (responseText, replyMarkup) = await _responseService.GetResponse(message.Text, chat.Id);
+                        await _client.SendTextMessageAsync(chat.Id, responseText, replyMarkup: replyMarkup);
+                        return;
                 }
             }
             catch (Exception ex)
@@ -62,25 +78,6 @@ namespace OracleDotoBot.Services
 
             _logger.LogError(ErrorMessage);
             return Task.CompletedTask;
-        }
-
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            var receiverOptions = new ReceiverOptions()
-            {
-                AllowedUpdates = new[]
-    {
-                UpdateType.Message
-            },
-                ThrowPendingUpdates = true
-            };
-            using var cts = new CancellationTokenSource();
-            _client.StartReceiving(UpdateHandler, ErrorHandler, receiverOptions, cts.Token);
-            var me = await _client.GetMeAsync();
-            _logger.LogInformation(me.Username + " started!");
-
-            Console.ReadLine();
-            cts.Cancel();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

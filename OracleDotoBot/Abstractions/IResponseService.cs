@@ -4,6 +4,6 @@ namespace OracleDotoBot.Abstractions
 {
     public interface IResponseService
     {
-        (string text, IReplyMarkup? replyMarkup) GetResponse(string messageText);
+        Task<(string text, IReplyMarkup? replyMarkup)> GetResponse(string messageText, long chatId);
     }
 }
