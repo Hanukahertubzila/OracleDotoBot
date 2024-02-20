@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OracleDotoBot.StratzApiParser.OutputDataTypes
+﻿namespace OracleDotoBot.StratzApiParser.OutputDataTypes
 {
     public class HeroStatistics
     {

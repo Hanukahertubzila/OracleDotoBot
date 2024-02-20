@@ -1,4 +1,4 @@
-﻿using OracleDotoBot.RequestModels;
+﻿using OracleDotoBot.Domain.Models;
 
 namespace OracleDotoBot.Abstractions
 {

@@ -1,4 +1,4 @@
-﻿namespace OracleDotoBot.RequestModels
+﻿namespace OracleDotoBot.Domain.Models
 {
     public class Team
     {

@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OracleDotoBot", "OracleDotoBot\OracleDotoBot.csproj", "{7B980BF1-AA6B-43CB-9B50-A9F1BD90CAA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OracleDotoBot", "OracleDotoBot\OracleDotoBot.csproj", "{7B980BF1-AA6B-43CB-9B50-A9F1BD90CAA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OracleDotoBot.StratzApiParser", "OracleDotoBot.StratzApiParser\OracleDotoBot.StratzApiParser.csproj", "{A255A92C-4A25-4716-A3C7-240B00AD4AB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OracleDotoBot.StratzApiParser", "OracleDotoBot.StratzApiParser\OracleDotoBot.StratzApiParser.csproj", "{A255A92C-4A25-4716-A3C7-240B00AD4AB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OracleDotoBot.Domain", "Domain\OracleDotoBot.Domain.csproj", "{CD25FC3E-F730-4D4C-9D3D-60B93D35BC85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A255A92C-4A25-4716-A3C7-240B00AD4AB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A255A92C-4A25-4716-A3C7-240B00AD4AB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A255A92C-4A25-4716-A3C7-240B00AD4AB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD25FC3E-F730-4D4C-9D3D-60B93D35BC85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD25FC3E-F730-4D4C-9D3D-60B93D35BC85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD25FC3E-F730-4D4C-9D3D-60B93D35BC85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD25FC3E-F730-4D4C-9D3D-60B93D35BC85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

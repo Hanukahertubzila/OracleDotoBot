@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Text.Json.Serialization;
-
-namespace OracleDotoBot.Models
+﻿namespace OracleDotoBot.Models
 {
     public class Hero
     {

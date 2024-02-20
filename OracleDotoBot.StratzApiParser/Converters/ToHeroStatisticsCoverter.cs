@@ -1,15 +1,16 @@
-﻿using OracleDotoBot.StratzApiParser.OutputDataTypes;
+﻿using OracleDotoBot.Domain.Models;
+using OracleDotoBot.StratzApiParser.OutputDataTypes;
 using OracleDotoBot.StratzApiParser.Response_Object_Models;
 
 namespace OracleDotoBot.StratzApiParser.Parsers
 {
     internal static class ToHeroStatisticsCoverter
     {
-        public static List<HeroStatistics> Covert(MatchUpStatisticsResponse response, List<int> heroIds)
+        public static List<HeroStatistics> Covert(MatchUpStatisticsResponse response, Match match)
         {
             var stats = new List<HeroStatistics>();
-            var radiantTeam = heroIds.Take(heroIds.Count / 2).ToList();
-            var direTeam = heroIds.Skip(heroIds.Count / 2).ToList();
+            var radiantTeam = match.HeroIds.Take(match.HeroIds.Count / 2).ToList();
+            var direTeam = match.HeroIds.Skip(match.HeroIds.Count / 2).ToList();
             GetStatsByTeam(response.Data.Stats, 
                 radiantTeam, 
                 direTeam, 

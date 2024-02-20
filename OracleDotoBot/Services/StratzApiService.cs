@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using OracleDotoBot.Abstractions;
-using OracleDotoBot.Models;
-using OracleDotoBot.RequestModels;
+using OracleDotoBot.Domain.Models;
 using OracleDotoBot.StratzApiParser.Api;
 using OracleDotoBot.StratzApiParser.OutputDataTypes;
 
@@ -22,17 +20,44 @@ namespace OracleDotoBot.Services
 
         public async Task<string> GetMatchUpStatistics(Match match)
         {
-            var stats = await _apiClient.GetMatchUpStatistics(match.HeroIds.ToList());
+            var stats = await _apiClient.GetMatchUpStatistics(match);
             if (!string.IsNullOrEmpty(stats.error))
             {
                 _logger.LogError(stats.error);
                 return stats.error;
             }
-            var responseStatistics = GetMatchUpStatsString(stats.stats);
+            var responseStatistics = GetMatchupStatisticsString(stats.stats);
+            var laning = await _apiClient.GetLaningStatistics(match);
+            if (!string.IsNullOrEmpty(laning.error))
+            {
+                _logger.LogError(laning.error);
+                return responseStatistics + laning.error;
+            }
+
+            responseStatistics += "WinCount: " + laning.stats.Mid.WinCount + 
+                " LossCount: " + laning.stats.Mid.LossCount + 
+                " DrawCount: " + laning.stats.Mid.DrawCount;
+
+            responseStatistics += "WinCount: " + laning.stats.CarryOfflane.WinCount +
+                " LossCount: " + laning.stats.CarryOfflane.LossCount +
+                " DrawCount: " + laning.stats.CarryOfflane.DrawCount;
+
+            responseStatistics += "WinCount: " + laning.stats.Supp5Supp4.WinCount +
+                " LossCount: " + laning.stats.Supp5Supp4.LossCount +
+                " DrawCount: " + laning.stats.Supp5Supp4.DrawCount;
+
+            responseStatistics += "WinCount: " + laning.stats.OfflaneCarry.WinCount +
+                " LossCount: " + laning.stats.OfflaneCarry.LossCount +
+                " DrawCount: " + laning.stats.OfflaneCarry.DrawCount;
+
+            responseStatistics += "WinCount: " + laning.stats.Mid.WinCount +
+                " LossCount: " + laning.stats.Supp4Supp5.LossCount +
+                " DrawCount: " + laning.stats.Supp4Supp5.DrawCount;
+
             return responseStatistics;
         }
 
-        private string GetMatchUpStatsString(List<HeroStatistics> stats)
+        private string GetMatchupStatisticsString(List<HeroStatistics> stats)
         {
             var radiantWinrate = Math.Round(stats
                 .Select(h => h.WinRate)

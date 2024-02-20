@@ -1,4 +1,4 @@
-﻿namespace OracleDotoBot.RequestModels
+﻿namespace OracleDotoBot.Domain.Models
 {
     public class Match
     {
@@ -6,6 +6,6 @@
 
         public Team DireTeam { get; set; } = new Team();
 
-        public HashSet<int> HeroIds { get; set; } = new HashSet<int>();
+        public List<int> HeroIds { get; set; } = new List<int>();
     }
 }

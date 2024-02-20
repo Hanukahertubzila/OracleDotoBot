@@ -2,10 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using OracleDotoBot.Abstractions;
 using OracleDotoBot.Models;
-using OracleDotoBot.RequestModels;
 using OracleDotoBot.Services;
 using Serilog;
 using Serilog.Extensions.Logging;
@@ -34,13 +32,36 @@ public class Program
 
         Log.Logger.Information("App starting");
 
+        var botToken = config["Token"];
+        var stratzBaseUrl = config["StratzBaseUrl"];
+        var stratzToken = config["StratzToken"];
+
+        if (botToken == null)
+        {
+            Log.Logger.Error("botToken was not found");
+            return;
+        }
+
+        if (stratzBaseUrl == null)
+        {
+            Log.Logger.Error("stratzBaseUrl was not found");
+            return;
+        }
+
+        if (stratzToken == null)
+        {
+            Log.Logger.Error("stratzToken was not found");
+            return;
+        }
+
         var host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
                 services.AddSingleton<ITelegramBotClient>(
-                    x => new TelegramBotClient(config["Token"]));
+                    x => new TelegramBotClient(botToken));
                 services.AddSingleton<IUserMatchesService, UserMatchesService>();
-                services.AddSingleton<IStratzApiService>(new StratzApiService(config["StratzBaseUrl"], config["StratzToken"], stratzApiLogger));
+                services.AddSingleton<IStratzApiService>(
+                    new StratzApiService(stratzBaseUrl, stratzToken, stratzApiLogger));
                 services.AddTransient<IResponseService, ResponseService>();
                 services.AddHostedService<MessagesRecieverService>();
                 services.Configure<List<Hero>>(heroes);

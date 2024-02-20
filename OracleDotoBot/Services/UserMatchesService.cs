@@ -1,6 +1,5 @@
 ﻿using OracleDotoBot.Abstractions;
-using OracleDotoBot.RequestModels;
-using Telegram.Bot.Requests;
+using OracleDotoBot.Domain.Models;
 
 namespace OracleDotoBot.Services
 {
