@@ -88,7 +88,7 @@ namespace OracleDotoBot.Services
             {
                 match.match.HeroIds.Add(heroId);
                 match.match.DireTeam.Pos5HeroId = heroId;
-                var stats = await _stratzApiService.GetMatchUpStatistics(match.match);
+                var stats = await _stratzApiService.GetStatisticsString(match.match);
                 return stats;
             }
             else

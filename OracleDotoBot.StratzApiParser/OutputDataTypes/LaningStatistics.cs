@@ -4,12 +4,8 @@
     {
         public LaningWDL Mid { get; set; }
 
-        public LaningWDL CarryOfflane { get; set; }
+        public LaningWDL EasyLane { get; set; }
 
-        public LaningWDL Supp5Supp4 { get; set; }
-
-        public LaningWDL OfflaneCarry { get; set; }
-
-        public LaningWDL Supp4Supp5 { get; set; }
+        public LaningWDL HardLane { get; set; }
     }
 }

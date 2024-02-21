@@ -53,7 +53,7 @@ namespace OracleDotoBot.Services
                     responseText = $@"ПРЕДСКАЗАТЬ ПОБЕДУ - чтобы получить анализ по драфту введи имена персонажей по их позиции и команде
 ТУРНИРЫ - список актуальных турниров и текущих игр с аналитикой по драфту
 СТАТИСТИКА - статистика бота за определенный период/турнир (собирается только на турнирах 1/2 дивизионов)";
-                    return (responseText, null);
+                    return (responseText, replyKeyboard);
                 case "Предсказать победу":
                     _userMatchesService.NewMatch(chatId);
                     responseText = "Керри команды сил света: ";
@@ -67,7 +67,7 @@ namespace OracleDotoBot.Services
                         responseText = await _userMatchesService.AlterMatch(chatId, command.Id);
                         return (responseText, null);
                     }
-                    return ("Неизвестная команда...", null);
+                    return ("Неизвестная команда...", replyKeyboard);
             }
         }
     }

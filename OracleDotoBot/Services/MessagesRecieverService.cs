@@ -57,7 +57,7 @@ namespace OracleDotoBot.Services
                         _logger.LogInformation("Message recieved! [" + message.Text + "]");
 
                         var (responseText, replyMarkup) = await _responseService.GetResponse(message.Text, chat.Id);
-                        await _client.SendTextMessageAsync(chat.Id, responseText, replyMarkup: replyMarkup);
+                        await _client.SendTextMessageAsync(chat.Id, responseText, replyMarkup: replyMarkup, parseMode: ParseMode.Markdown);
                         return;
                 }
             }

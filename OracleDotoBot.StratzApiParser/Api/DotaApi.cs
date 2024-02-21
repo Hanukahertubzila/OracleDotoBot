@@ -108,16 +108,40 @@ namespace OracleDotoBot.StratzApiParser.Api
             laningStatisticsResponse.OfflaneVsSupp5 = responseOfflaneVsSupp5.data;
 
             var responseSupp4VsSupp5 = await _client.Request<LaningData>(
-                GetLaningQuery(match.RadiantTeam.Pos3HeroId, Positions.POSITION_4, false));
+                GetLaningQuery(match.RadiantTeam.Pos4HeroId, Positions.POSITION_4, false));
             if (!string.IsNullOrEmpty(responseSupp4VsSupp5.error))
                 return (null, responseSupp4VsSupp5.error);
             laningStatisticsResponse.Supp4VsSupp5 = responseSupp4VsSupp5.data;
 
             var responseSupp4VsCarry = await _client.Request<LaningData>(
-                GetLaningQuery(match.RadiantTeam.Pos3HeroId, Positions.POSITION_4, false));
+                GetLaningQuery(match.RadiantTeam.Pos4HeroId, Positions.POSITION_4, false));
             if (!string.IsNullOrEmpty(responseSupp4VsCarry.error))
                 return (null, responseSupp4VsCarry.error);
             laningStatisticsResponse.Supp4VsCarry = responseSupp4VsCarry.data;
+
+            var responseRadiantCarrySupp5 = await _client.Request<LaningData>(
+                GetLaningQuery(match.RadiantTeam.Pos1HeroId, Positions.POSITION_1, true));
+            if (!string.IsNullOrEmpty(responseRadiantCarrySupp5.error))
+                return (null, responseRadiantCarrySupp5.error);
+            laningStatisticsResponse.RadiantCarrySupp5 = responseRadiantCarrySupp5.data;
+
+            var responseDireCarrySupp5 = await _client.Request<LaningData>(
+                GetLaningQuery(match.DireTeam.Pos1HeroId, Positions.POSITION_1, true));
+            if (!string.IsNullOrEmpty(responseDireCarrySupp5.error))
+                return (null, responseDireCarrySupp5.error);
+            laningStatisticsResponse.DireCarrySupp5 = responseDireCarrySupp5.data;
+
+            var responseRadiantOfflaneSupp4 = await _client.Request<LaningData>(
+                GetLaningQuery(match.RadiantTeam.Pos3HeroId, Positions.POSITION_3, true));
+            if (!string.IsNullOrEmpty(responseRadiantOfflaneSupp4.error))
+                return (null, responseRadiantOfflaneSupp4.error);
+            laningStatisticsResponse.RadiantOfflaneSupp4 = responseRadiantOfflaneSupp4.data;
+
+            var responseDireOfflaneSupp4 = await _client.Request<LaningData>(
+                GetLaningQuery(match.DireTeam.Pos3HeroId, Positions.POSITION_3, true));
+            if (!string.IsNullOrEmpty(responseDireOfflaneSupp4.error))
+                return (null, responseDireOfflaneSupp4.error);
+            laningStatisticsResponse.DireOfflaneSupp4 = responseDireOfflaneSupp4.data;
 
             var stats = ToLaningStatisticsConverter.Covert(laningStatisticsResponse, match);
 

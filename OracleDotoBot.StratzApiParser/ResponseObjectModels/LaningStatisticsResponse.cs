@@ -22,6 +22,14 @@ namespace OracleDotoBot.StratzApiParser.ResponseObjectModels
         public LaningData Supp4VsSupp5 { get; set; }
 
         public LaningData Supp4VsCarry { get; set; }
+
+        public LaningData RadiantCarrySupp5 { get; set; }
+
+        public LaningData DireCarrySupp5 { get; set; } 
+
+        public LaningData RadiantOfflaneSupp4 { get; set; }
+
+        public LaningData DireOfflaneSupp4 { get; set; }
     }
 
     public class LaningData
@@ -45,21 +53,21 @@ namespace OracleDotoBot.StratzApiParser.ResponseObjectModels
     public class LaneOutcome
     {
         [JsonProperty("winCount")]
-        public long WinCount { get; set; }
+        public int WinCount { get; set; }
 
         [JsonProperty("drawCount")]
-        public long DrawCount { get; set; }
+        public int DrawCount { get; set; }
 
         [JsonProperty("lossCount")]
-        public long LossCount { get; set; }
+        public int LossCount { get; set; }
 
         [JsonProperty("stompWinCount")]
-        public long StompWinCount { get; set; }
+        public int StompWinCount { get; set; }
 
         [JsonProperty("stompLossCount")]
-        public long StompLossCount { get; set; }
+        public int StompLossCount { get; set; }
 
         [JsonProperty("heroId2")]
-        public long HeroId2 { get; set; }
+        public int HeroId2 { get; set; }
     }
 }

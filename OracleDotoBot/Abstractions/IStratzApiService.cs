@@ -4,6 +4,6 @@ namespace OracleDotoBot.Abstractions
 {
     public interface IStratzApiService
     {
-        Task<string> GetMatchUpStatistics(Match match);
+        Task<string> GetStatisticsString(Match match);
     }
 }
