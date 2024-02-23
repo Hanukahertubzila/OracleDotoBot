@@ -59,9 +59,11 @@ public class Program
             {
                 services.AddSingleton<ITelegramBotClient>(
                     x => new TelegramBotClient(botToken));
-                services.AddSingleton<IUserMatchesService, UserMatchesService>();
+                services.AddSingleton<IMatchesResultService, MatchesResultService>();
                 services.AddSingleton<IStratzApiService>(
-                    new StratzApiService(stratzBaseUrl, stratzToken, stratzApiLogger));
+                    new StratzApiService(stratzBaseUrl, stratzToken, 
+                    stratzApiLogger, heroes.Get<List<Hero>>()));
+                services.AddSingleton<ILiveMatchesService, LiveMatchesService>();
                 services.AddTransient<IResponseService, ResponseService>();
                 services.AddHostedService<MessagesRecieverService>();
                 services.Configure<List<Hero>>(heroes);

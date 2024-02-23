@@ -8,19 +8,19 @@ namespace OracleDotoBot.StratzApiParser.Converters
     {
         public static (LaningStatistics? stats, string error) Covert(LaningStatisticsResponse response, Match match)
         {
-            var midWDL = GetLaningWDL(response.MidVsMid, match.DireTeam.Pos2HeroId, false);
-            var carryVsOfflaneWDL = GetLaningWDL(response.CarryVsOfflane, match.DireTeam.Pos3HeroId, false);
-            var carryVsSupp4WDL = GetLaningWDL(response.CarryVsSupp4, match.DireTeam.Pos4HeroId, false);
-            var supp5VsSupp4WDL = GetLaningWDL(response.Supp5VsSupp4, match.DireTeam.Pos4HeroId, false);
-            var supp5VsOfflaneWDL = GetLaningWDL(response.Supp5VsOfflane, match.DireTeam.Pos3HeroId, false);
-            var offlaneVsCarryWDL = GetLaningWDL(response.OfflaneVsCarry, match.DireTeam.Pos1HeroId, false);
-            var offlaneVsSupp5WDL = GetLaningWDL(response.OfflaneVsSupp5, match.DireTeam.Pos5HeroId, false);
-            var supp4VsSupp5WDL = GetLaningWDL(response.Supp4VsSupp5, match.DireTeam.Pos5HeroId, false);
-            var supp4VsCarryWDL = GetLaningWDL(response.Supp4VsCarry, match.DireTeam.Pos1HeroId, false);
-            var radiantCarrySupp5WDL = GetLaningWDL(response.RadiantCarrySupp5, match.RadiantTeam.Pos5HeroId, false);
-            var direCarrySupp5WDL = GetLaningWDL(response.DireCarrySupp5, match.DireTeam.Pos5HeroId, true);
-            var radiantOfflaneSupp4WDL = GetLaningWDL(response.RadiantOfflaneSupp4, match.RadiantTeam.Pos4HeroId, false);
-            var direOfflaneSupp4WDL = GetLaningWDL(response.DireOfflaneSupp4, match.DireTeam.Pos4HeroId, true);
+            var midWDL = GetLaningWDL(response.MidVsMid, match.DireTeam.Pos2.Hero.Id, false);
+            var carryVsOfflaneWDL = GetLaningWDL(response.CarryVsOfflane, match.DireTeam.Pos3.Hero.Id, false);
+            var carryVsSupp4WDL = GetLaningWDL(response.CarryVsSupp4, match.DireTeam.Pos4.Hero.Id, false);
+            var supp5VsSupp4WDL = GetLaningWDL(response.Supp5VsSupp4, match.DireTeam.Pos4.Hero.Id, false);
+            var supp5VsOfflaneWDL = GetLaningWDL(response.Supp5VsOfflane, match.DireTeam.Pos3.Hero.Id, false);
+            var offlaneVsCarryWDL = GetLaningWDL(response.OfflaneVsCarry, match.DireTeam.Pos1.Hero.Id, false);
+            var offlaneVsSupp5WDL = GetLaningWDL(response.OfflaneVsSupp5, match.DireTeam.Pos5.Hero.Id, false);
+            var supp4VsSupp5WDL = GetLaningWDL(response.Supp4VsSupp5, match.DireTeam.Pos5.Hero.Id, false);
+            var supp4VsCarryWDL = GetLaningWDL(response.Supp4VsCarry, match.DireTeam.Pos1.Hero.Id, false);
+            var radiantCarrySupp5WDL = GetLaningWDL(response.RadiantCarrySupp5, match.RadiantTeam.Pos5.Hero.Id, false);
+            var direCarrySupp5WDL = GetLaningWDL(response.DireCarrySupp5, match.DireTeam.Pos5.Hero.Id, true);
+            var radiantOfflaneSupp4WDL = GetLaningWDL(response.RadiantOfflaneSupp4, match.RadiantTeam.Pos4.Hero.Id, false);
+            var direOfflaneSupp4WDL = GetLaningWDL(response.DireOfflaneSupp4, match.DireTeam.Pos4.Hero.Id, true);
 
             if (!string.IsNullOrEmpty(midWDL.error))
                 return (null, midWDL.error);

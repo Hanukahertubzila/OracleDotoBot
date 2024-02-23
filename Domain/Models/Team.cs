@@ -2,14 +2,16 @@
 {
     public class Team
     {
-        public int Pos1HeroId { get; set; } = 0;
+        public string Name { get; set; } = "Неизвестно";
 
-        public int Pos2HeroId { get; set; } = 0;
+        public Player Pos1 { get; set; }
 
-        public int Pos3HeroId { get; set; } = 0;
+        public Player Pos2 { get; set; }
 
-        public int Pos4HeroId { get; set; } = 0;
+        public Player Pos3 { get; set; }
 
-        public int Pos5HeroId { get; set; } = 0;
+        public Player Pos4 { get; set; }
+
+        public Player Pos5 { get; set; }
     }
 }

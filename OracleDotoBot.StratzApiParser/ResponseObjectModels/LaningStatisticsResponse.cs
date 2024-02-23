@@ -38,7 +38,7 @@ namespace OracleDotoBot.StratzApiParser.ResponseObjectModels
         public Data Data { get; set; }
     }
 
-    public class Data
+    public partial class Data
     {
         [JsonProperty("heroStats")]
         public HeroStats HeroStats { get; set; }
