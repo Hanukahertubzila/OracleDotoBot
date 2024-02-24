@@ -22,74 +22,43 @@ namespace OracleDotoBot.StratzApiParser.Converters
             var radiantOfflaneSupp4WDL = GetLaningWDL(response.RadiantOfflaneSupp4, match.RadiantTeam.Pos4.Hero.Id, false);
             var direOfflaneSupp4WDL = GetLaningWDL(response.DireOfflaneSupp4, match.DireTeam.Pos4.Hero.Id, true);
 
-            if (!string.IsNullOrEmpty(midWDL.error))
-                return (null, midWDL.error);
-
-            if (!string.IsNullOrEmpty(carryVsOfflaneWDL.error))
-                return (null, carryVsOfflaneWDL.error);
-
-            if (!string.IsNullOrEmpty(carryVsSupp4WDL.error))
-                return (null, carryVsSupp4WDL.error);
-
-            if (!string.IsNullOrEmpty(supp5VsSupp4WDL.error))
-                return (null, supp5VsSupp4WDL.error);
-
-            if (!string.IsNullOrEmpty(supp5VsOfflaneWDL.error))
-                return (null, supp5VsOfflaneWDL.error);
-
-            if (!string.IsNullOrEmpty(offlaneVsCarryWDL.error))
-                return (null, offlaneVsCarryWDL.error);
-
-            if (!string.IsNullOrEmpty(offlaneVsCarryWDL.error))
-                return (null, offlaneVsCarryWDL.error);
-
-            if (!string.IsNullOrEmpty(supp4VsSupp5WDL.error))
-                return (null, supp4VsSupp5WDL.error);
-
-            if (!string.IsNullOrEmpty(radiantCarrySupp5WDL.error))
-                return (null, radiantCarrySupp5WDL.error);
-
-            if (!string.IsNullOrEmpty(direCarrySupp5WDL.error))
-                return (null, direCarrySupp5WDL.error);
-
-            if (!string.IsNullOrEmpty(radiantOfflaneSupp4WDL.error))
-                return (null, radiantOfflaneSupp4WDL.error);
-
-            if (!string.IsNullOrEmpty(direOfflaneSupp4WDL.error))
-                return (null, direOfflaneSupp4WDL.error);
-
             var laningStatistics = new LaningStatistics()
             {
-                Mid = midWDL.wdl,
-                EasyLane = carryVsOfflaneWDL.wdl
-                    .GetWDLSum(carryVsSupp4WDL.wdl, 
-                    supp5VsOfflaneWDL.wdl, 
-                    supp5VsSupp4WDL.wdl,
-                    radiantCarrySupp5WDL.wdl,
-                    direOfflaneSupp4WDL.wdl),
-                HardLane = offlaneVsCarryWDL.wdl
-                    .GetWDLSum(offlaneVsSupp5WDL.wdl,
-                    supp4VsCarryWDL.wdl,
-                    supp4VsSupp5WDL.wdl,
-                    radiantOfflaneSupp4WDL.wdl,
-                    direCarrySupp5WDL.wdl)
+                Mid = midWDL,
+                EasyLane = carryVsOfflaneWDL
+                    .GetWDLSum(carryVsSupp4WDL, 
+                    supp5VsOfflaneWDL, 
+                    supp5VsSupp4WDL,
+                    radiantCarrySupp5WDL,
+                    direOfflaneSupp4WDL),
+                HardLane = offlaneVsCarryWDL
+                    .GetWDLSum(offlaneVsSupp5WDL,
+                    supp4VsCarryWDL,
+                    supp4VsSupp5WDL,
+                    radiantOfflaneSupp4WDL,
+                    direCarrySupp5WDL)
             };
 
             return (laningStatistics, "");
         }
 
-        private static (LaningWDL? wdl, string error) GetLaningWDL(LaningData data, int heroId, bool isDire)
+        private static LaningWDL GetLaningWDL(LaningData data, int heroId, bool isDire)
         {
             var stats = data.Data.HeroStats.LaneOutcome
                 .FirstOrDefault(h => h.HeroId2 == heroId);
             if (stats == null)
-                return (null, "laning not found for " + heroId);
-            return (new LaningWDL()
+                return new LaningWDL()
+                {
+                    WinCount = 0,
+                    DrawCount = 0,
+                    LossCount = 0
+                };
+            return new LaningWDL()
             {
                 WinCount = isDire ? stats.LossCount + stats.StompLossCount * 2 : stats.WinCount + stats.StompWinCount * 2,
                 DrawCount = stats.DrawCount,
                 LossCount = isDire ? stats.WinCount + stats.StompWinCount * 2 : stats.LossCount + stats.StompLossCount * 2
-            }, "");
+            };
         }
     }
 }

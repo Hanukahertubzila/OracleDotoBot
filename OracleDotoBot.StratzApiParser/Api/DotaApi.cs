@@ -29,7 +29,7 @@ namespace OracleDotoBot.StratzApiParser.Api
                   live {
                     matches (request : {
                       isLeague : true
-                      take : 6
+                      take : 5
                     }) {
      	                matchId
                       gameState

@@ -9,14 +9,17 @@ namespace OracleDotoBot.StratzApiParser.Converters
         public static List<Match> Convert(LiveMatchesResponse response, List<Hero> heroes)
         {
             var matches = new List<Match>();
+            if (response.Data.Live.Matches == null)
+                return matches;
             foreach (var m in response.Data.Live.Matches)
             {
                 if ((m.GameState == "STRATEGY_TIME" || 
                     m.GameState == "PRE_GAME" || 
                     m.GameState == "GAME_IN_PROGRESS" ||
                     m.GameState == "POST_GAME") && 
-                    m.RadiantTeam.Name != null && 
-                    m.DireTeam.Name != null)
+                    m.RadiantTeam != null && 
+                    m.DireTeam != null &&
+                    m.Players != null)
                 {
                     var match = new Match();
                     match.RadiantTeam.Name = m.RadiantTeam.Name;

@@ -75,7 +75,9 @@ namespace OracleDotoBot.Services
                     return "Саппорт 5 команды сил тьмы: ";
                 default:
                     match.match.DireTeam.Pos5 = new Player() { Hero = hero };
-                    return await GetMatchResult(_matches.First(c => c.chatId == chatId).match);
+                    var matchResult = await GetMatchResult(_matches.First(c => c.chatId == chatId).match);
+                    _matches.Remove(_matches.First(m => m.chatId == chatId));
+                    return matchResult;
             }           
         }
     }

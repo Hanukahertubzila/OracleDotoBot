@@ -26,7 +26,7 @@ namespace OracleDotoBot.Services
 
             LiveMatches = matches;
 
-            if (matches.Count < 6)
+            if (matches.Count < 5)
                 _logger.LogInformation("Matches count is less than expected");
 
             var keyboard = new ReplyKeyboardMarkup(
@@ -50,8 +50,7 @@ namespace OracleDotoBot.Services
                 {
                     new KeyboardButton(matches.Count > 4 ?
                         $"{ matches[4].RadiantTeam.Name } VS {matches[4].DireTeam.Name }" : "no match"),
-                    new KeyboardButton(matches.Count > 5 ?
-                        $"{ matches[5].RadiantTeam.Name } VS {matches[5].DireTeam.Name }" : "no match")
+                    new KeyboardButton("Назад")
                 }
                 })
             {
