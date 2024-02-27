@@ -7,13 +7,14 @@ using OracleDotoBot.StratzApiParser.OutputDataTypes;
 using OracleDotoBot.StratzApiParser.Parsers;
 using OracleDotoBot.StratzApiParser.Response_Object_Models;
 using OracleDotoBot.StratzApiParser.ResponseObjectModels;
+using System.Text;
 using Match = OracleDotoBot.Domain.Models.Match;
 
 namespace OracleDotoBot.StratzApiParser.Api
 {
-    public class DotaApi
+    public class StratzDotaApi
     {
-        public DotaApi(string baseUrl, string token, List<Hero> heroes)
+        public StratzDotaApi(string baseUrl, string token, List<Hero> heroes)
         {
             _client = new ApiClient(baseUrl, token);
             _heroes = heroes;
@@ -21,42 +22,6 @@ namespace OracleDotoBot.StratzApiParser.Api
 
         private readonly ApiClient _client;
         private readonly List<Hero> _heroes;
-
-        public async Task<(List<Match> matches, string error)> GetLiveMatches()
-        {
-            string query = @"
-                {
-                  live {
-                    matches (request : {
-                      isLeague : true
-                      take : 5
-                    }) {
-     	                matchId
-                      gameState
-                      radiantTeam{
-                        name
-                      }
-                      direTeam {
-                        name
-                      }
-                      players {
-                        isRadiant
-                        position
-                        heroId
-                      }
-                    }
-                  }
-                }
-            ";
-
-            var matchesResponse = await _client.Request<LiveMatchesResponse>(query);
-            if (!string.IsNullOrEmpty(matchesResponse.error))
-                return (new List<Match>(), matchesResponse.error);
-
-            var matches = ToMatchesConverter.Convert(matchesResponse.data, _heroes);
-
-            return (matches, "");
-        }
 
         public async Task<(List<HeroStatistics> stats, string error)> GetMatchUpStatistics(Match match)
         {

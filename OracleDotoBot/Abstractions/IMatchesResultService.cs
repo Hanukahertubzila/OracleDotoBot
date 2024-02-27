@@ -7,7 +7,9 @@ namespace OracleDotoBot.Abstractions
     {
         Task<string> AlterMatch(long chatId, Hero hero);
 
-        Task<string> GetMatchResult(Match match);
+        Task<string> GetMatchResult(Match match, bool includeLaning);
         void NewMatch(long chatId);
+
+        public List<(Match match, long chatId)> Matches { get; }
     }
 }

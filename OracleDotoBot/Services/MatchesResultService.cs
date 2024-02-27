@@ -6,36 +6,37 @@ namespace OracleDotoBot.Services
 {
     public class MatchesResultService : IMatchesResultService
     {
-        public MatchesResultService(IStratzApiService stratzApiService)
+        public MatchesResultService(IMatchAnaliticsService analiticsService)
         {
-            _matches = new List<(Match match, long chatId)>();
-            _stratzApiService = stratzApiService;
+            _matchAnaliticsService = analiticsService;
+            Matches = new List<(Match match, long chatId)>();
         }
 
-        private readonly List<(Match match, long chatId)> _matches;
-        private readonly IStratzApiService _stratzApiService;
+        public List<(Match match, long chatId)> Matches { get; private set; }
+
+        private readonly IMatchAnaliticsService _matchAnaliticsService;
 
         public void NewMatch(long chatId)
         {
-            var match = _matches.FirstOrDefault(m => m.chatId == chatId);
+            var match = Matches.FirstOrDefault(m => m.chatId == chatId);
             if (match.match != null)
-                _matches.Remove(match);
-            _matches.Add((new Match(), chatId));
+                Matches.Remove(match);
+            Matches.Add((new Match(), chatId));
         }
 
-        public async Task<string> GetMatchResult(Match match)
+        public async Task<string> GetMatchResult(Match match, bool includeLaning)
         {
-            var result = await _stratzApiService.GetStatisticsString(match);
+            var result = await _matchAnaliticsService.GetMatchAnalitics(match, true, includeLaning);
             return result;
         }
 
         public async Task<string> AlterMatch(long chatId, Hero hero)
         {
-            var match = _matches.FirstOrDefault(m => m.chatId == chatId);
+            var match = Matches.FirstOrDefault(m => m.chatId == chatId);
             if (match.match == null)
             {
                 NewMatch(chatId);
-                match = _matches.FirstOrDefault(m => m.chatId == chatId);
+                match = Matches.FirstOrDefault(m => m.chatId == chatId);
             }
 
             if (match.match.HeroIds.Contains(hero.Id))
@@ -75,8 +76,8 @@ namespace OracleDotoBot.Services
                     return "Саппорт 5 команды сил тьмы: ";
                 default:
                     match.match.DireTeam.Pos5 = new Player() { Hero = hero };
-                    var matchResult = await GetMatchResult(_matches.First(c => c.chatId == chatId).match);
-                    _matches.Remove(_matches.First(m => m.chatId == chatId));
+                    var matchResult = await GetMatchResult(Matches.First(c => c.chatId == chatId).match, true);
+                    Matches.Remove(Matches.First(m => m.chatId == chatId));
                     return matchResult;
             }           
         }

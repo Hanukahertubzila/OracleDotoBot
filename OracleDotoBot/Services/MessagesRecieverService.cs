@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OracleDotoBot.Abstractions;
+using OracleDotoBot.Domain.Models;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace OracleDotoBot.Services
 {
@@ -56,8 +56,7 @@ namespace OracleDotoBot.Services
 
                         _logger.LogInformation("Message recieved! [" + message.Text + "]");
 
-                        var (responseText, replyMarkup) = await _responseService.GetResponse(message.Text, chat.Id);
-                        await _client.SendTextMessageAsync(chat.Id, responseText, replyMarkup: replyMarkup, parseMode: ParseMode.Markdown);
+                        await _responseService.GetResponse(message.Text, chat.Id);
                         return;
                 }
             }

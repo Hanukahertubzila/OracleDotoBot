@@ -30,11 +30,15 @@ public class Program
         var stratzApiLogger = new SerilogLoggerFactory(Log.Logger)
             .CreateLogger<IStratzApiService>();
 
+        var steamApiLogger = new SerilogLoggerFactory(Log.Logger)
+            .CreateLogger<ISteamApiService>();
+
         Log.Logger.Information("App starting");
 
         var botToken = config["Token"];
         var stratzBaseUrl = config["StratzBaseUrl"];
         var stratzToken = config["StratzToken"];
+        var steamToken = config["SteamApiToken"];
 
         if (botToken == null)
         {
@@ -54,6 +58,12 @@ public class Program
             return;
         }
 
+        if (steamToken == null)
+        {
+            Log.Logger.Error("steamToken was not found");
+            return;
+        }
+
         var host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
@@ -64,6 +74,9 @@ public class Program
                     new StratzApiService(stratzBaseUrl, stratzToken, 
                     stratzApiLogger, heroes.Get<List<Hero>>()));
                 services.AddSingleton<ILiveMatchesService, LiveMatchesService>();
+                services.AddSingleton<ISteamApiService>(
+                    new SteamApiService(steamToken, heroes.Get<List<Hero>>(), steamApiLogger));
+                services.AddScoped<IMatchAnaliticsService, MatchAnaliticsService>();
                 services.AddTransient<IResponseService, ResponseService>();
                 services.AddHostedService<MessagesRecieverService>();
                 services.Configure<List<Hero>>(heroes);

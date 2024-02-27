@@ -20,7 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\OracleDotoBot.Domain.csproj" />
-    <ProjectReference Include="..\OracleDotoBot.StratzApiParser\OracleDotoBot.StratzApiParser.csproj" />
+    <ProjectReference Include="..\OracleDotoBot.SteamApi\OracleDotoBot.SteamApi.csproj" />
+    <ProjectReference Include="..\OracleDotoBot.StratzApiParser\OracleDotoBot.StratzApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

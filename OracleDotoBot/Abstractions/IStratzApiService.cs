@@ -1,11 +1,12 @@
 ﻿using OracleDotoBot.Domain.Models;
+using OracleDotoBot.StratzApiParser.OutputDataTypes;
 
 namespace OracleDotoBot.Abstractions
 {
     public interface IStratzApiService
     {
-        Task<string> GetStatisticsString(Match match);
+        Task<LaningStatistics?> GetLaningStatistics(Match match);
 
-        Task<List<Match>> GetLiveMatches();
+        Task<List<HeroStatistics>> GetMatchupStatistics(Match match);
     }
 }

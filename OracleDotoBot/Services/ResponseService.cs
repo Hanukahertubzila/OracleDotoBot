@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using OracleDotoBot.Abstractions;
 using OracleDotoBot.Models;
+using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace OracleDotoBot.Services
@@ -11,20 +12,20 @@ namespace OracleDotoBot.Services
         public ResponseService(IOptions<List<Hero>> heroes, 
             IMatchesResultService matchesResultService,
             ILiveMatchesService liveMatchesService,
-            ILogger<ResponseService> logger)
+            ITelegramBotClient client)
         {
             _heroes = heroes;
             _matchesResultService = matchesResultService;
             _liveMatchesService = liveMatchesService;
-            _logger = logger;
+            _client = client;
         }
 
         private readonly IOptions<List<Hero>> _heroes;
         private readonly IMatchesResultService _matchesResultService;
         private readonly ILiveMatchesService _liveMatchesService;
-        private readonly ILogger<ResponseService> _logger;
+        private readonly ITelegramBotClient _client;
 
-        public async Task<(string text, IReplyMarkup? replyMarkup)> GetResponse(string messageText, long chatId)
+        public async Task GetResponse(string messageText, long chatId)
         {
             var responseText = "";
             var replyKeyboard = new ReplyKeyboardMarkup(
@@ -50,50 +51,60 @@ namespace OracleDotoBot.Services
             switch (messageText)
             {
                 case "/start":
-                    return ("Привет лудик! \nВАЖНО ПРОЧИТАТЬ: \nБот служит помощником в анализе драфта, и хотя я не учил его проигрывать, никаких 100% результатов он не дает, внимательно читай аналитику и принимай решение сам, основываясь на цифрах. Оценка драфта и формирование результатов может занять некоторое время... \nудачи <3", replyKeyboard);
+                    responseText = "Привет лудик! \nВАЖНО ПРОЧИТАТЬ: \nБот служит помощником в анализе драфта, и хотя я не учил его проигрывать, никаких 100% результатов он не дает, внимательно читай аналитику и принимай решение сам, основываясь на цифрах. Оценка драфта и формирование результатов может занять некоторое время... \nудачи <3";
+                    break;
                 case "Помощь":
                     responseText = $@"*ПРЕДСКАЗАТЬ ПОБЕДУ* - чтобы получить анализ по драфту введи имена персонажей по их позиции и команде (имена нужно вводить без ошибок на английском как они записаны в самой доте)
 *ЛАЙВ МАТЧИ* - список актуальных матчей с аналитикой
 *СТАТИСТИКА* - статистика бота за определенный период/турнир (собирается только на турнирах 1/2 дивизионов)";
-                    return (responseText, replyKeyboard);
+                    break;
                 case "Предсказать победу":
                     _matchesResultService.NewMatch(chatId);
                     responseText = "Керри команды сил света: ";
-                    return (responseText, null);
+                    break;
                 case "Лайв матчи":
-                    var liveMatchesKeyboard = await _liveMatchesService.GetLiveMatchesKeyboard();
-                    return ("Лайв матчи: ", liveMatchesKeyboard);
+                    responseText = "Лайв матчи: ";
+                    replyKeyboard = await _liveMatchesService.GetLiveMatchesKeyboard();
+                    break;
                 case "Статистика бота":
                     responseText = @"В моем коде заложена функция 
 function SetWinChanсes() {
     let winChance = 100%
     let proebChance = 0%
 }
-поэтому проиграть невозможно, сегодня онли вин.....
-    ";
-                    return (responseText, replyKeyboard);
+поэтому проиграть невозможно, сегодня онли вин.....";
+                    break;
                 case "Назад":
-                    return ("Меню: ", replyKeyboard);
+                    responseText = "Меню: ";
+                    break;
                 default:
                     var heroCommand = _heroes.Value
                         .FirstOrDefault(h => h.Name == messageText
                         || h.LocalizedName == messageText);
                     if (heroCommand != null)
                     {
+                        if (_matchesResultService.Matches.FirstOrDefault(m => m.chatId == chatId) != default &&
+                            _matchesResultService.Matches.FirstOrDefault(m => m.chatId == chatId).match.HeroIds.Count == 9)
+                        {
+                            await _client.SendTextMessageAsync(chatId, "Подождите...");
+                        }
                         responseText = await _matchesResultService.AlterMatch(chatId, heroCommand);
-                        return (responseText, null);
+                        replyKeyboard = null;
+                        break;
                     }
 
                     var matchCommand = _liveMatchesService.LiveMatches
-                        .FirstOrDefault(m =>
-                        $"{m.RadiantTeam.Name} VS {m.DireTeam.Name}" == messageText);
+                        .FirstOrDefault(m => $"{ m.RadiantTeam.Name } VS { m.DireTeam.Name }" == messageText);
                     if (matchCommand != null)
                     {
-                        responseText = await _matchesResultService.GetMatchResult(matchCommand);
-                        return (responseText, replyKeyboard);
+                        await _client.SendTextMessageAsync(chatId, "Подождите...");
+                        responseText = await _matchesResultService.GetMatchResult(matchCommand, false);
+                        break;
                     }
-                    return ("Неизвестная команда...", replyKeyboard);
+                    responseText = "Неизвестная команда...";
+                    break;
             }
+            await _client.SendTextMessageAsync(chatId, responseText, replyMarkup: replyKeyboard, parseMode: ParseMode.Markdown);
         }
     }
 }
