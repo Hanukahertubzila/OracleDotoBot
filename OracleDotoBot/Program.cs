@@ -72,7 +72,7 @@ public class Program
                 services.AddSingleton<IMatchesResultService, MatchesResultService>();
                 services.AddSingleton<IStratzApiService>(
                     new StratzApiService(stratzBaseUrl, stratzToken, 
-                    stratzApiLogger, heroes.Get<List<Hero>>()));
+                    stratzApiLogger));
                 services.AddSingleton<ILiveMatchesService, LiveMatchesService>();
                 services.AddSingleton<ISteamApiService>(
                     new SteamApiService(steamToken, heroes.Get<List<Hero>>(), steamApiLogger));

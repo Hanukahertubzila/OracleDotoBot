@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using OracleDotoBot.StratzApiParser.OutputDataTypes;
 
 namespace OracleDotoBot.StratzApiParser.ResponseObjectModels
 {

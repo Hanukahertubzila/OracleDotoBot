@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using OracleDotoBot.Abstractions;
 using OracleDotoBot.Domain.Models;
-using OracleDotoBot.Models;
+using OracleDotoBot.StratzApi.OutputDataTypes;
 using OracleDotoBot.StratzApiParser.Api;
 using OracleDotoBot.StratzApiParser.OutputDataTypes;
 
@@ -10,16 +10,25 @@ namespace OracleDotoBot.Services
     public class StratzApiService : IStratzApiService
     {
         public StratzApiService(string baseUrl, string stratzToken, 
-            ILogger<IStratzApiService> logger,
-            List<Hero> heroes)
+            ILogger<IStratzApiService> logger)
         {
-            _apiClient = new StratzDotaApi(baseUrl, stratzToken, heroes);
+            _apiClient = new StratzDotaApi(baseUrl, stratzToken);
             _logger = logger;
         }
 
         private readonly StratzDotaApi _apiClient;
         private readonly ILogger<IStratzApiService> _logger;
 
+        public async Task<List<PlayerPerformance>> GetPlayerPerformance(Match match)
+        {
+            var matchWithPerformance = await _apiClient.GetPlayerHeroPerformance(match);
+            if (!string.IsNullOrEmpty(matchWithPerformance.error))
+            {
+                _logger.LogError(matchWithPerformance.error);
+                return matchWithPerformance.match;
+            }
+            return matchWithPerformance.match;
+        }
 
         public async Task<List<HeroStatistics>> GetMatchupStatistics(Match match)
         {

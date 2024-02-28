@@ -86,7 +86,7 @@ function SetWinChanсes() {
                         if (_matchesResultService.Matches.FirstOrDefault(m => m.chatId == chatId) != default &&
                             _matchesResultService.Matches.FirstOrDefault(m => m.chatId == chatId).match.HeroIds.Count == 9)
                         {
-                            await _client.SendTextMessageAsync(chatId, "Подождите...");
+                            await _client.SendTextMessageAsync(chatId, "Готовим аналитику...");
                         }
                         responseText = await _matchesResultService.AlterMatch(chatId, heroCommand);
                         replyKeyboard = null;
@@ -97,8 +97,8 @@ function SetWinChanсes() {
                         .FirstOrDefault(m => $"{ m.RadiantTeam.Name } VS { m.DireTeam.Name }" == messageText);
                     if (matchCommand != null)
                     {
-                        await _client.SendTextMessageAsync(chatId, "Подождите...");
-                        responseText = await _matchesResultService.GetMatchResult(matchCommand, false);
+                        await _client.SendTextMessageAsync(chatId, "Готовим аналитику...");
+                        responseText = await _matchesResultService.GetMatchResult(matchCommand, false, true);
                         break;
                     }
                     responseText = "Неизвестная команда...";

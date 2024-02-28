@@ -1,5 +1,6 @@
 ﻿using OracleDotoBot.Domain.Models;
-using OracleDotoBot.Models;
+using OracleDotoBot.StratzApi.OutputDataTypes;
+using OracleDotoBot.StratzApi.ResponseObjectModels;
 using OracleDotoBot.StratzApiParser.Client;
 using OracleDotoBot.StratzApiParser.Converters;
 using OracleDotoBot.StratzApiParser.Enums;
@@ -7,21 +8,144 @@ using OracleDotoBot.StratzApiParser.OutputDataTypes;
 using OracleDotoBot.StratzApiParser.Parsers;
 using OracleDotoBot.StratzApiParser.Response_Object_Models;
 using OracleDotoBot.StratzApiParser.ResponseObjectModels;
-using System.Text;
-using Match = OracleDotoBot.Domain.Models.Match;
+using System.Net.Http.Headers;
 
 namespace OracleDotoBot.StratzApiParser.Api
 {
     public class StratzDotaApi
     {
-        public StratzDotaApi(string baseUrl, string token, List<Hero> heroes)
+        public StratzDotaApi(string baseUrl, string token)
         {
             _client = new ApiClient(baseUrl, token);
-            _heroes = heroes;
         }
 
         private readonly ApiClient _client;
-        private readonly List<Hero> _heroes;
+
+        public async Task<(List<PlayerPerformance> match, string error)> GetPlayerHeroPerformance(Match match)
+        {
+            var playerPerformances = new List<PlayerPerformance>();
+            var rpos1 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.RadiantTeam.Pos1.Hero.Id, 
+                match.RadiantTeam.Pos1.AccountId));
+            if (!string.IsNullOrEmpty(rpos1.error))
+                return (playerPerformances, rpos1.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.RadiantTeam.Pos1.Hero.Id,
+                TotalMatchCount = rpos1.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = rpos1.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var rpos2 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.RadiantTeam.Pos2.Hero.Id,
+                match.RadiantTeam.Pos2.AccountId));
+            if (!string.IsNullOrEmpty(rpos2.error))
+                return (playerPerformances, rpos2.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.RadiantTeam.Pos2.Hero.Id,
+                TotalMatchCount = rpos2.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = rpos2.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var rpos3 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.RadiantTeam.Pos3.Hero.Id,
+                match.RadiantTeam.Pos3.AccountId));
+            if (!string.IsNullOrEmpty(rpos3.error))
+                return (playerPerformances, rpos3.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.RadiantTeam.Pos3.Hero.Id,
+                TotalMatchCount = rpos3.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = rpos3.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var rpos4 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.RadiantTeam.Pos4.Hero.Id,
+                match.RadiantTeam.Pos4.AccountId));
+            if (!string.IsNullOrEmpty(rpos4.error))
+                return (playerPerformances, rpos4.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.RadiantTeam.Pos4.Hero.Id,
+                TotalMatchCount = rpos4.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = rpos4.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var rpos5 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.RadiantTeam.Pos5.Hero.Id,
+                match.RadiantTeam.Pos5.AccountId));
+            if (!string.IsNullOrEmpty(rpos5.error))
+                return (playerPerformances, rpos5.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.RadiantTeam.Pos5.Hero.Id,
+                TotalMatchCount = rpos5.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = rpos5.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var dpos1 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.DireTeam.Pos1.Hero.Id,
+                match.DireTeam.Pos1.AccountId));
+            if (!string.IsNullOrEmpty(dpos1.error))
+                return (playerPerformances, dpos1.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.DireTeam.Pos1.Hero.Id,
+                TotalMatchCount = dpos1.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = dpos1.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var dpos2 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.DireTeam.Pos2.Hero.Id,
+                match.DireTeam.Pos2.AccountId));
+            if (!string.IsNullOrEmpty(dpos2.error))
+                return (playerPerformances, dpos2.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.DireTeam.Pos2.Hero.Id,
+                TotalMatchCount = dpos2.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = dpos2.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var dpos3 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.DireTeam.Pos3.Hero.Id,
+                match.DireTeam.Pos3.AccountId));
+            if (!string.IsNullOrEmpty(dpos3.error))
+                return (playerPerformances, dpos3.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.DireTeam.Pos3.Hero.Id,
+                TotalMatchCount = dpos3.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = dpos3.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var dpos4 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.DireTeam.Pos4.Hero.Id,
+                match.DireTeam.Pos4.AccountId));
+            if (!string.IsNullOrEmpty(dpos4.error))
+                return (playerPerformances, dpos4.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.DireTeam.Pos4.Hero.Id,
+                TotalMatchCount = dpos4.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = dpos4.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            var dpos5 = await _client.Request<HeroPerformanceResponse>
+                (GetHeroPerformanceQuery(match.DireTeam.Pos5.Hero.Id,
+                match.DireTeam.Pos5.AccountId));
+            if (!string.IsNullOrEmpty(dpos5.error))
+                return (playerPerformances, dpos5.error);
+            playerPerformances.Add(new PlayerPerformance()
+            {
+                HeroId = match.DireTeam.Pos5.Hero.Id,
+                TotalMatchCount = dpos5.data.Data.Player.HeroPerformance.MatchCount,
+                WinMatchCount = dpos5.data.Data.Player.HeroPerformance.WinCount
+            });
+
+            return (playerPerformances, "");
+        }
 
         public async Task<(List<HeroStatistics> stats, string error)> GetMatchUpStatistics(Match match)
         {
@@ -152,6 +276,22 @@ namespace OracleDotoBot.StratzApiParser.Api
             if (!string.IsNullOrEmpty(stats.error))
                 return (null, stats.error);
             return (stats.stats, "");
+        }
+
+        private string GetHeroPerformanceQuery(int heroId, long steamId)
+        {
+            string query = $@"
+                {{
+	                player (steamAccountId : { steamId }) {{
+		                heroPerformance (heroId : { heroId }  request : {{ isLeague : true take : 100 }}) {{
+                      winCount
+                      matchCount
+                    }}
+                  }}
+                }}
+            ";
+
+            return query;
         }
 
         private string GetLaningQuery(int heroId, Positions position, bool isWith)

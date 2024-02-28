@@ -2,6 +2,7 @@
 using OracleDotoBot.Abstractions;
 using OracleDotoBot.Domain.Models;
 using OracleDotoBot.Models;
+using OracleDotoBot.StratzApi.OutputDataTypes;
 using OracleDotoBot.StratzApiParser.OutputDataTypes;
 
 namespace OracleDotoBot.Services
@@ -18,11 +19,16 @@ namespace OracleDotoBot.Services
         private readonly IStratzApiService _stratzApiService;
         private readonly List<Hero> _heroes;
 
-        public async Task<string> GetMatchAnalitics(Match match, bool includeMatchUp, bool includeLaning)
+        public async Task<string> GetMatchAnalitics(Match match, bool includeMatchUp, bool includeLaning, bool includePlayerPerformance)
         {
             var analitics = "";
             var matchups = new List<HeroStatistics>();
             var laning = default(LaningStatistics);
+            var playerPerformance = new List<PlayerPerformance>();
+            if (includePlayerPerformance)
+            {
+                playerPerformance = await _stratzApiService.GetPlayerPerformance(match);
+            }
             if (includeMatchUp)
             {
                 matchups = await _stratzApiService.GetMatchupStatistics(match);
@@ -33,10 +39,10 @@ namespace OracleDotoBot.Services
                 laning = await _stratzApiService.GetLaningStatistics(match);
                 analitics += GetBriefLaningStatisticsString(laning);
             }
-            analitics += "\n\n*ПОДРОБНЕЕ: *\n\n";
+            analitics += "\n\n*ПОДРОБНЕЕ: *\n";
             if (includeMatchUp)
             {
-                analitics += GetFullMatchupStatisticsString(matchups);
+                analitics += GetFullMatchupStatisticsString(matchups, playerPerformance, includePlayerPerformance);
             }
             if (includeLaning)
             {
@@ -131,7 +137,7 @@ namespace OracleDotoBot.Services
             return "*НАМНОГО СИЛЬНЕЕ* (отклонение более 15%)";
         }
 
-        private string GetFullMatchupStatisticsString(List<HeroStatistics> stats)
+        private string GetFullMatchupStatisticsString(List<HeroStatistics> stats, List<PlayerPerformance> performances, bool includePlayerPerformance)
         {
             var statistics = "\n*Матч апы: *\n";
 
@@ -140,7 +146,19 @@ namespace OracleDotoBot.Services
                 var heroStats = "\n*" + _heroes.First(h => h.Id == hero.HeroId).LocalizedName + "*";
                 heroStats += "\nВинрейт в патче: " + Math.Round(hero.WinRate * 100, 2) + "%";
                 heroStats += "\nСинергия героя: " + Math.Round(hero.WinsWith * 100, 2) + "%";
-                heroStats += "\nХорошая игра для героя на: " + Math.Round(hero.WinsVs * 100, 2) + "%\n";
+                heroStats += "\nХорошая игра для героя на: " + Math.Round(hero.WinsVs * 100, 2) + "%";
+                if (includePlayerPerformance)
+                {
+                    var p = performances.FirstOrDefault(p => p.HeroId == hero.HeroId);
+                    if (p != null)
+                    {
+                        heroStats += "\nКоличество матчей игрока на герое: " + p.TotalMatchCount;
+                        if (p.TotalMatchCount > 0)
+                            heroStats += "\nВинрейт игрока на герое: " 
+                                + Math.Round((double)p.WinMatchCount / p.TotalMatchCount * 100, 2) + "%";
+                        heroStats += "\n";
+                    }
+                }
                 statistics += heroStats;
             }
             return statistics;

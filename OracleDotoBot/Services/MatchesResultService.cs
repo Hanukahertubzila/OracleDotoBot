@@ -24,9 +24,9 @@ namespace OracleDotoBot.Services
             Matches.Add((new Match(), chatId));
         }
 
-        public async Task<string> GetMatchResult(Match match, bool includeLaning)
+        public async Task<string> GetMatchResult(Match match, bool includeLaning, bool includePlayerPerformance)
         {
-            var result = await _matchAnaliticsService.GetMatchAnalitics(match, true, includeLaning);
+            var result = await _matchAnaliticsService.GetMatchAnalitics(match, true, includeLaning, includePlayerPerformance);
             return result;
         }
 
@@ -76,7 +76,7 @@ namespace OracleDotoBot.Services
                     return "Саппорт 5 команды сил тьмы: ";
                 default:
                     match.match.DireTeam.Pos5 = new Player() { Hero = hero };
-                    var matchResult = await GetMatchResult(Matches.First(c => c.chatId == chatId).match, true);
+                    var matchResult = await GetMatchResult(Matches.First(c => c.chatId == chatId).match, true, false);
                     Matches.Remove(Matches.First(m => m.chatId == chatId));
                     return matchResult;
             }           

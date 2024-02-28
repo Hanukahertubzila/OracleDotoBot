@@ -7,5 +7,9 @@ namespace OracleDotoBot.Domain.Models
         public Hero Hero { get; set; }
 
         public long AccountId { get; set; }
+
+        public int HeroTotalMatchCount { get; set; }
+
+        public int HeroWinMatchCount { get; set; }
     }
 }
