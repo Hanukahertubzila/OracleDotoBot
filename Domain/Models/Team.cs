@@ -2,7 +2,7 @@
 {
     public class Team
     {
-        public string Name { get; set; } = "Неизвестно";
+        public string Name { get; set; } = string.Empty;
 
         public Player Pos1 { get; set; }
 

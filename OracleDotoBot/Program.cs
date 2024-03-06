@@ -7,6 +7,7 @@ using OracleDotoBot.Models;
 using OracleDotoBot.Services;
 using Serilog;
 using Serilog.Extensions.Logging;
+using System.Reflection;
 using Telegram.Bot;
 
 public class Program
@@ -88,7 +89,7 @@ public class Program
 
     private static void BuildConfig(IConfigurationBuilder builder)
     {
-        builder.SetBasePath(Directory.GetCurrentDirectory())
+        builder.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
             .AddJsonFile("heroes.json", optional: false, reloadOnChange: true)

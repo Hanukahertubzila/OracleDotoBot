@@ -32,7 +32,7 @@ namespace OracleDotoBot.Services
             if (includeMatchUp)
             {
                 matchups = await _stratzApiService.GetMatchupStatistics(match);
-                analitics += GetBriefMatchupStatisticsString(matchups);
+                analitics += GetBriefMatchupStatisticsString(matchups, match);
             }
             if (includeLaning)
             {
@@ -51,7 +51,7 @@ namespace OracleDotoBot.Services
             return analitics;
         }
 
-        private string GetBriefMatchupStatisticsString(List<HeroStatistics> stats)
+        private string GetBriefMatchupStatisticsString(List<HeroStatistics> stats, Match match)
         {
             var radiantWinrate = Math.Round(stats
                 .Select(h => h.WinRate)
@@ -83,9 +83,14 @@ namespace OracleDotoBot.Services
             var radiantPower = radiantWinrate / 2 + radiantMatchupWithWinrate + radiantMatchupVsWinrate;
             var direPower = direWinrate / 2 + direMatchupWithWinrate + direMatchupVsWinrate;
 
-            var strongerDraft = radiantPower > direPower ? "СВЕТА" : "ТЬМЫ";
+            var strongerDraft = string.Empty;
+            if (!string.IsNullOrEmpty(match.RadiantTeam.Name) && !string.IsNullOrEmpty(match.DireTeam.Name))
+                strongerDraft = radiantPower > direPower ? $"{match.RadiantTeam.Name} (свет) " 
+                    : $"{match.DireTeam.Name} (тьма) ";
+            else
+                strongerDraft = radiantPower > direPower ? "СВЕТА" : "ТЬМЫ";
 
-            var statistics = @$"*ДРАФТ СИЛ {strongerDraft} СИЛЬНЕЕ*
+            var statistics = @$"*ДРАФТ {strongerDraft} СИЛЬНЕЕ*
 
 *Метовость драфта: *
 *Свет: *{radiantWinrate}% *Тьма: *{direWinrate}%; 
@@ -155,8 +160,9 @@ namespace OracleDotoBot.Services
                         heroStats += "\nКоличество матчей игрока на герое: " + p.TotalMatchCount;
                         if (p.TotalMatchCount > 0)
                             heroStats += "\nВинрейт игрока на герое: " 
-                                + Math.Round((double)p.WinMatchCount / p.TotalMatchCount * 100, 2) + "%";
-                        heroStats += "\n";
+                                + Math.Round((double)p.WinMatchCount / p.TotalMatchCount * 100, 2) + "%\n";
+                        else
+                            heroStats += "\n";
                     }
                 }
                 statistics += heroStats;

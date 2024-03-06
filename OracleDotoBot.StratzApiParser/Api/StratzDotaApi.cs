@@ -8,7 +8,6 @@ using OracleDotoBot.StratzApiParser.OutputDataTypes;
 using OracleDotoBot.StratzApiParser.Parsers;
 using OracleDotoBot.StratzApiParser.Response_Object_Models;
 using OracleDotoBot.StratzApiParser.ResponseObjectModels;
-using System.Net.Http.Headers;
 
 namespace OracleDotoBot.StratzApiParser.Api
 {

@@ -16,7 +16,7 @@ namespace OracleDotoBot.StratzApi.ResponseObjectModels
 
     public partial class Player
     {
-        [JsonProperty("heroPerformance")]
+        [JsonProperty("heroPerformance", NullValueHandling = NullValueHandling.Ignore)]
         public HeroPerformance HeroPerformance { get; set; } = new HeroPerformance();
     }
 
