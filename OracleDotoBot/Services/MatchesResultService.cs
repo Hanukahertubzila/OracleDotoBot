@@ -6,15 +6,17 @@ namespace OracleDotoBot.Services
 {
     public class MatchesResultService : IMatchesResultService
     {
-        public MatchesResultService(IMatchAnaliticsService analiticsService)
+        public MatchesResultService(IMatchAnaliticsService analiticsService, IStratzApiService stratzApiService)
         {
             _matchAnaliticsService = analiticsService;
+            _stratzApiService = stratzApiService;
             Matches = new List<(Match match, long chatId)>();
         }
 
         public List<(Match match, long chatId)> Matches { get; private set; }
 
         private readonly IMatchAnaliticsService _matchAnaliticsService;
+        private readonly IStratzApiService _stratzApiService;
 
         public void NewMatch(long chatId)
         {
@@ -22,6 +24,14 @@ namespace OracleDotoBot.Services
             if (match.match != null)
                 Matches.Remove(match);
             Matches.Add((new Match(), chatId));
+        }
+
+        public async Task<string> GetMatchResultById(long id)
+        {
+            var match = await _stratzApiService.GetMatchById(id);
+
+            var result = await _matchAnaliticsService.GetMatchAnalitics(match, true, false, false);
+            return result;
         }
 
         public async Task<string> GetMatchResult(Match match, bool includeLaning, bool includePlayerPerformance)

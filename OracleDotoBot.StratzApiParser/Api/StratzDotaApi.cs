@@ -1,4 +1,5 @@
 ﻿using OracleDotoBot.Domain.Models;
+using OracleDotoBot.Models;
 using OracleDotoBot.StratzApi.OutputDataTypes;
 using OracleDotoBot.StratzApi.ResponseObjectModels;
 using OracleDotoBot.StratzApiParser.Client;
@@ -13,12 +14,42 @@ namespace OracleDotoBot.StratzApiParser.Api
 {
     public class StratzDotaApi
     {
-        public StratzDotaApi(string baseUrl, string token)
+        public StratzDotaApi(string baseUrl, string token, List<Hero> heroes)
         {
             _client = new ApiClient(baseUrl, token);
+            _heroes = heroes;
         }
 
         private readonly ApiClient _client;
+        private readonly List<Hero> _heroes;
+
+        public async Task<(Match? match, string error)> GetMatchById(long id)
+        {
+            var query = $@"
+                {{
+	                match(id : {id}) {{
+                    radiantTeam {{
+                        name
+                    }}
+                    direTeam {{
+                        name
+                    }}
+                    players {{
+                      isRadiant
+                      heroId
+                      position
+                    }}
+                  }}
+                }}";
+
+            var matchResponse = await _client.Request<MatchResponse>(query);
+
+            if (!string.IsNullOrEmpty(matchResponse.error))
+                return (null,  matchResponse.error);
+
+            var match = ToMatchConverter.Convert(matchResponse.data, _heroes);
+            return (match, string.Empty);
+        }
 
         public async Task<(List<PlayerPerformance> match, string error)> GetPlayerHeroPerformance(Match match)
         {
@@ -143,7 +174,7 @@ namespace OracleDotoBot.StratzApiParser.Api
                 WinMatchCount = dpos5.data.Data.Player.HeroPerformance.WinCount
             });
 
-            return (playerPerformances, "");
+            return (playerPerformances, string.Empty);
         }
 
         public async Task<(List<HeroStatistics> stats, string error)> GetMatchUpStatistics(Match match)
@@ -185,7 +216,7 @@ namespace OracleDotoBot.StratzApiParser.Api
                 return (new List<HeroStatistics>(), response.error);
             
             var stats = ToHeroStatisticsCoverter.Covert(response.data, match);
-            return (stats, "");
+            return (stats, string.Empty);
         }
 
         public async Task<(LaningStatistics? stats, string error)> GetLaningStatistics(Match match)
@@ -274,7 +305,7 @@ namespace OracleDotoBot.StratzApiParser.Api
 
             if (!string.IsNullOrEmpty(stats.error))
                 return (null, stats.error);
-            return (stats.stats, "");
+            return (stats.stats, string.Empty);
         }
 
         private string GetHeroPerformanceQuery(int heroId, long steamId)

@@ -6,34 +6,34 @@ namespace OracleDotoBot.StratzApiParser.ResponseObjectModels
     public class MatchResponse
     {
         [JsonProperty("data")]
-        public Data Data { get; set; }
+        public DataR Data { get; set; }
     }
 
-    public partial class Data
+    public partial class DataR
     {
         [JsonProperty("match")]
-        public MatchA Match { get; set; }
+        public MatchR Match { get; set; }
     }
 
-    public partial class MatchA
+    public partial class MatchR
     {
         [JsonProperty("radiantTeam")]
-        public TeamA RadiantTeam { get; set; }
+        public TeamR RadiantTeam { get; set; }
 
         [JsonProperty("direTeam")]
-        public TeamA DireTeam { get; set; }
+        public TeamR DireTeam { get; set; }
 
         [JsonProperty("players")]
-        public List<PlayerA> Players { get; set; }
+        public List<PlayerR> Players { get; set; }
     }
 
-    public partial class TeamA
+    public partial class TeamR
     {
         [JsonProperty("name")]
         public string Name { get; set; }
     }
 
-    public partial class PlayerA
+    public partial class PlayerR
     {
         [JsonProperty("isRadiant")]
         public bool IsRadiant { get; set; }

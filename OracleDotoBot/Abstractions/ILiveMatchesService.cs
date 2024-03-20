@@ -5,8 +5,10 @@ namespace OracleDotoBot.Abstractions
 {
     public interface ILiveMatchesService
     {
-        Task<ReplyKeyboardMarkup> GetLiveMatchesKeyboard();
+        ReplyKeyboardMarkup GetLiveMatchesKeyboard();
 
-        List<Match> LiveMatches { get; }
+        Task UpdateLiveMatches();
+
+        List<(Match match, string analitics)> LiveMatches { get; }
     }
 }

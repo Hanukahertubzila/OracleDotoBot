@@ -64,7 +64,7 @@ namespace OracleDotoBot.Services
                     break;
                 case "Лайв матчи":
                     responseText = "Лайв матчи: ";
-                    replyKeyboard = await _liveMatchesService.GetLiveMatchesKeyboard();
+                    replyKeyboard = _liveMatchesService.GetLiveMatchesKeyboard();
                     break;
                 case "Статистика бота":
                     responseText = @"В моем коде заложена функция 
@@ -94,11 +94,18 @@ function SetWinChanсes() {
                     }
 
                     var matchCommand = _liveMatchesService.LiveMatches
-                        .FirstOrDefault(m => $"{ m.RadiantTeam.Name } VS { m.DireTeam.Name }" == messageText);
-                    if (matchCommand != null)
+                        .FirstOrDefault(m => $"{ m.match.RadiantTeam.Name } VS { m.match.DireTeam.Name }" == messageText);
+                    if (matchCommand.match != null)
                     {
                         await _client.SendTextMessageAsync(chatId, "Готовим аналитику...");
-                        responseText = await _matchesResultService.GetMatchResult(matchCommand, false, true);
+                        responseText = matchCommand.analitics;
+                        break;
+                    }
+                    long id = 0;
+                    if (long.TryParse(messageText, out id))
+                    {
+                        await _client.SendTextMessageAsync(chatId, "Готовим аналитику...");
+                        responseText = await _matchesResultService.GetMatchResultById(id);
                         break;
                     }
                     responseText = "Неизвестная команда...";

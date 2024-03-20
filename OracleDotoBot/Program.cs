@@ -36,7 +36,7 @@ public class Program
 
         Log.Logger.Information("App starting");
 
-        var botToken = config["Token"];
+        var botToken = config["TelegramToken"];
         var stratzBaseUrl = config["StratzBaseUrl"];
         var stratzToken = config["StratzToken"];
         var steamToken = config["SteamApiToken"];
@@ -73,7 +73,7 @@ public class Program
                 services.AddSingleton<IMatchesResultService, MatchesResultService>();
                 services.AddSingleton<IStratzApiService>(
                     new StratzApiService(stratzBaseUrl, stratzToken, 
-                    stratzApiLogger));
+                    stratzApiLogger, heroes.Get<List<Hero>>()));
                 services.AddSingleton<ILiveMatchesService, LiveMatchesService>();
                 services.AddSingleton<ISteamApiService>(
                     new SteamApiService(steamToken, heroes.Get<List<Hero>>(), steamApiLogger));
@@ -84,6 +84,7 @@ public class Program
             })
             .UseSerilog()
             .Build();
+
         await host.RunAsync();
     }
 

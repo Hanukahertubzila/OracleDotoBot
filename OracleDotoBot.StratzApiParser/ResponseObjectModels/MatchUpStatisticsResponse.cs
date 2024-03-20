@@ -5,32 +5,32 @@ namespace OracleDotoBot.StratzApiParser.Response_Object_Models
     public class MatchUpStatisticsResponse
     {
         [JsonProperty("data")]
-        public Data Data { get; set; }
+        public DataR Data { get; set; }
     }
 
-    public class Data
+    public partial class DataR
     {
 
         [JsonProperty("heroStats")]
-        public HeroStats Stats { get; set; }
+        public HeroStatsR Stats { get; set; }
     }
 
-    public class HeroStats
+    public class HeroStatsR
     {
         [JsonProperty("matchUp")]
-        public MatchUp[] MatchUp { get; set; }
+        public MatchUpR[] MatchUp { get; set; }
     }
 
-    public class MatchUp
+    public class MatchUpR
     {
         [JsonProperty("with")]
-        public Stats[] With { get; set; }
+        public StatsR[] With { get; set; }
 
         [JsonProperty("vs")]
-        public Stats[] Vs { get; set; }
+        public StatsR[] Vs { get; set; }
     }
 
-    public class Stats
+    public class StatsR
     {
         [JsonProperty("heroId1")]
         public int HeroId1 { get; set; }

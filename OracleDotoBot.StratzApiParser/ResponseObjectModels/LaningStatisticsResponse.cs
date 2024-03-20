@@ -34,22 +34,22 @@ namespace OracleDotoBot.StratzApiParser.ResponseObjectModels
     public class LaningData
     {
         [JsonProperty("data")]
-        public Data Data { get; set; }
+        public DataR Data { get; set; }
     }
 
-    public partial class Data
+    public partial class DataR
     {
         [JsonProperty("heroStats")]
-        public HeroStats HeroStats { get; set; }
+        public HeroStatsR HeroStats { get; set; }
     }
 
-    public class HeroStats
+    public class HeroStatsR
     {
         [JsonProperty("laneOutcome")]
-        public LaneOutcome[] LaneOutcome { get; set; }
+        public LaneOutcomeR[] LaneOutcome { get; set; }
     }
 
-    public class LaneOutcome
+    public class LaneOutcomeR
     {
         [JsonProperty("winCount")]
         public int WinCount { get; set; }

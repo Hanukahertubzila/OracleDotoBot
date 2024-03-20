@@ -6,6 +6,8 @@ namespace OracleDotoBot.Abstractions
 {
     public interface IStratzApiService
     {
+        Task<Match?> GetMatchById(long id);
+
         Task<LaningStatistics?> GetLaningStatistics(Match match);
 
         Task<List<HeroStatistics>> GetMatchupStatistics(Match match);

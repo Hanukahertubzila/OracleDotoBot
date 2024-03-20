@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OracleDotoBot.Abstractions;
-using OracleDotoBot.Domain.Models;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -14,15 +13,18 @@ namespace OracleDotoBot.Services
     {
         public MessagesRecieverService(ITelegramBotClient client, 
             IResponseService responseService,
+            ILiveMatchesService liveMatchesService,
             ILogger<MessagesRecieverService> logger)
         {
             _client = client;
             _responseService = responseService;
+            _liveMatchesService = liveMatchesService;
             _logger = logger;
         }
 
         private readonly ITelegramBotClient _client;
         private readonly IResponseService _responseService;
+        private readonly ILiveMatchesService _liveMatchesService;
         private readonly ILogger<MessagesRecieverService> _logger;
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -30,7 +32,7 @@ namespace OracleDotoBot.Services
             var receiverOptions = new ReceiverOptions()
             {
                 AllowedUpdates = new[]
-    {
+            {           
                 UpdateType.Message
             },
                 ThrowPendingUpdates = true
@@ -40,6 +42,10 @@ namespace OracleDotoBot.Services
             var me = await _client.GetMeAsync();
             _logger.LogInformation(me.Username + " started!");
 
+            var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+
+            while (await timer.WaitForNextTickAsync())
+                await _liveMatchesService.UpdateLiveMatches();
             Console.ReadLine();
             cts.Cancel();
         }

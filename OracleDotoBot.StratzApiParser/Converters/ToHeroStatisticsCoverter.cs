@@ -22,7 +22,7 @@ namespace OracleDotoBot.StratzApiParser.Parsers
             return stats;
         }
 
-        private static void GetStatsByTeam(HeroStats heroStats, List<int> team1, List<int> team2, List<HeroStatistics> stats, int matchUpOffset)
+        private static void GetStatsByTeam(HeroStatsR heroStats, List<int> team1, List<int> team2, List<HeroStatistics> stats, int matchUpOffset)
         {
             for(int i = 0; i < team1.Count; i++)
             {
