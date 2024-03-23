@@ -1,7 +1,7 @@
 ﻿using OracleDotoBot.Domain.Models;
 using OracleDotoBot.Models;
 
-namespace OracleDotoBot.Abstractions
+namespace OracleDotoBot.Abstractions.Services
 {
     public interface IMatchesResultService
     {

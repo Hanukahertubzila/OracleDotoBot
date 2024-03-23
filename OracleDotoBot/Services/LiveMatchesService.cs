@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using OracleDotoBot.Abstractions;
+using OracleDotoBot.Abstractions.Services;
 using OracleDotoBot.Domain.Models;
 using Telegram.Bot.Types.ReplyMarkups;
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using OracleDotoBot.Abstractions;
+using OracleDotoBot.Abstractions.Services;
 using OracleDotoBot.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
@@ -29,22 +29,22 @@ namespace OracleDotoBot.Services
         {
             var responseText = "";
             var replyKeyboard = new ReplyKeyboardMarkup(
-                                        new List<KeyboardButton[]>()
-                                        {
-                                        new KeyboardButton[]
-                                        {
-                                            new KeyboardButton("Предсказать победу"),
-                                            new KeyboardButton("Лайв матчи"),
-                                        },
-                                        new KeyboardButton[]
-                                        {
-                                            new KeyboardButton("Статистика бота")
-                                        },
-                                        new KeyboardButton[]
-                                        {
-                                            new KeyboardButton("Помощь")
-                                        }
-                                        })
+                new List<KeyboardButton[]>()
+                {
+                new KeyboardButton[]
+                {
+                    new KeyboardButton("Предсказать победу"),
+                    new KeyboardButton("Лайв матчи"),
+                },
+                new KeyboardButton[]
+                {
+                    new KeyboardButton("Статистика бота")
+                },
+                new KeyboardButton[]
+                {
+                    new KeyboardButton("Помощь")
+                }
+                })
             {
                 ResizeKeyboard = true,
             };

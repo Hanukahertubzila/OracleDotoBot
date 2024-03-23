@@ -1,4 +1,4 @@
-﻿using OracleDotoBot.Abstractions;
+﻿using OracleDotoBot.Abstractions.Services;
 using OracleDotoBot.Domain.Models;
 using OracleDotoBot.Models;
 

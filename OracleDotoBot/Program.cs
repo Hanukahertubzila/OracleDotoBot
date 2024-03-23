@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OracleDotoBot.Abstractions;
+using OracleDotoBot.Abstractions.Services;
+using OracleDotoBot.DAL;
+using OracleDotoBot.DAL.Repositories;
 using OracleDotoBot.Models;
 using OracleDotoBot.Services;
 using Serilog;
@@ -68,15 +71,18 @@ public class Program
         var host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
+                services.AddDbContext<UsersDbContext>();
+                services.AddScoped<UsersRepository>();
                 services.AddSingleton<ITelegramBotClient>(
                     x => new TelegramBotClient(botToken));
                 services.AddSingleton<IMatchesResultService, MatchesResultService>();
                 services.AddSingleton<IStratzApiService>(
                     new StratzApiService(stratzBaseUrl, stratzToken, 
-                    stratzApiLogger, heroes.Get<List<Hero>>()));
+                    stratzApiLogger, heroes.Get<List<Hero>>() ?? new List<Hero>()));
                 services.AddSingleton<ILiveMatchesService, LiveMatchesService>();
+                services.AddSingleton<IUsersService, UsersService>();
                 services.AddSingleton<ISteamApiService>(
-                    new SteamApiService(steamToken, heroes.Get<List<Hero>>(), steamApiLogger));
+                    new SteamApiService(steamToken, heroes.Get<List<Hero>>() ?? new List<Hero>(), steamApiLogger));
                 services.AddScoped<IMatchAnaliticsService, MatchAnaliticsService>();
                 services.AddTransient<IResponseService, ResponseService>();
                 services.AddHostedService<MessagesRecieverService>();
@@ -84,15 +90,15 @@ public class Program
             })
             .UseSerilog()
             .Build();
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         await host.RunAsync();
     }
 
     private static void BuildConfig(IConfigurationBuilder builder)
     {
-        builder.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
+        builder//.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
             .AddJsonFile("heroes.json", optional: false, reloadOnChange: true)
             .AddEnvironmentVariables();
     }

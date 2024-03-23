@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OracleDotoBot.Abstractions;
+using OracleDotoBot.Abstractions.Services;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -14,17 +14,20 @@ namespace OracleDotoBot.Services
         public MessagesRecieverService(ITelegramBotClient client, 
             IResponseService responseService,
             ILiveMatchesService liveMatchesService,
+            IUsersService usersService,
             ILogger<MessagesRecieverService> logger)
         {
             _client = client;
             _responseService = responseService;
             _liveMatchesService = liveMatchesService;
+            _usersService = usersService;
             _logger = logger;
         }
 
         private readonly ITelegramBotClient _client;
         private readonly IResponseService _responseService;
         private readonly ILiveMatchesService _liveMatchesService;
+        private readonly IUsersService _usersService;
         private readonly ILogger<MessagesRecieverService> _logger;
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -41,6 +44,9 @@ namespace OracleDotoBot.Services
             _client.StartReceiving(UpdateHandler, ErrorHandler, receiverOptions, cts.Token);
             var me = await _client.GetMeAsync();
             _logger.LogInformation(me.Username + " started!");
+
+            await _usersService.UpdateActiveUsersList();
+            await _liveMatchesService.UpdateLiveMatches();
 
             var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
 
@@ -61,8 +67,10 @@ namespace OracleDotoBot.Services
                         var chat = message.Chat;
 
                         _logger.LogInformation("Message recieved! [" + message.Text + "]");
-
-                        await _responseService.GetResponse(message.Text, chat.Id);
+                        if (await _usersService.CheckSubscription(message.From.Id))
+                            await _responseService.GetResponse(message.Text, chat.Id);
+                        else
+                            await _client.SendTextMessageAsync(chat.Id, "Ваша подписка на бота закончилась! Чтобы снова начать пользоваться функциями бота произведите оплату...");
                         return;
                 }
             }

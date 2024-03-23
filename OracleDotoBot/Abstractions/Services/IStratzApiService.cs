@@ -2,7 +2,7 @@
 using OracleDotoBot.StratzApi.OutputDataTypes;
 using OracleDotoBot.StratzApiParser.OutputDataTypes;
 
-namespace OracleDotoBot.Abstractions
+namespace OracleDotoBot.Abstractions.Services
 {
     public interface IStratzApiService
     {
