@@ -9,5 +9,9 @@ namespace OracleDotoBot.Abstractions.Services
         Task<bool> CheckSubscription(long id);
 
         Task UpdateActiveUsersList();
+
+        Task<string> GetSubscriptionPeriod(long id);
+
+        Task<string> UpdateSubscription(int daysCount, long id);
     }
 }

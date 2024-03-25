@@ -97,7 +97,7 @@ public class Program
 
     private static void BuildConfig(IConfigurationBuilder builder)
     {
-        builder//.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
+        builder.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location))
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile("heroes.json", optional: false, reloadOnChange: true)
             .AddEnvironmentVariables();

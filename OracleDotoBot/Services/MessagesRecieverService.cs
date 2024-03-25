@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OracleDotoBot.Abstractions.Services;
 using Telegram.Bot;
@@ -6,6 +7,7 @@ using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace OracleDotoBot.Services
 {
@@ -36,7 +38,8 @@ namespace OracleDotoBot.Services
             {
                 AllowedUpdates = new[]
             {           
-                UpdateType.Message
+                UpdateType.Message,
+                UpdateType.PreCheckoutQuery
             },
                 ThrowPendingUpdates = true
             };
@@ -60,18 +63,47 @@ namespace OracleDotoBot.Services
         {
             try
             {
+                var message = update.Message;
                 switch (update.Type)
                 {
                     case UpdateType.Message:
-                        var message = update.Message;
                         var chat = message.Chat;
-
                         _logger.LogInformation("Message recieved! [" + message.Text + "]");
+                        if (message.SuccessfulPayment != null)
+                        {
+                            var replyKeyboard = new ReplyKeyboardMarkup(
+                            new List<KeyboardButton[]>()
+                            {
+                                new KeyboardButton[]
+                                {
+                                    new KeyboardButton("Лайв матчи"),
+                                    new KeyboardButton("Ввести героев"),
+                                },
+                                new KeyboardButton[]
+                                {
+                                    new KeyboardButton("Статистика бота"),
+                                    new KeyboardButton("Подписка")
+                                },
+                                new KeyboardButton[]
+                                {
+                                    new KeyboardButton("Помощь")
+                                }
+                            })
+                                {
+                                    ResizeKeyboard = true,
+                                };
+                            var subscriptionResponse = await _usersService.UpdateSubscription(int.Parse(message.SuccessfulPayment.InvoicePayload), message.From.Id);
+                            await _client.SendTextMessageAsync(chat.Id, subscriptionResponse, replyMarkup: replyKeyboard);
+                            break;
+                        }
                         if (await _usersService.CheckSubscription(message.From.Id))
-                            await _responseService.GetResponse(message.Text, chat.Id);
+                            await _responseService.GetResponse(message.Text, chat.Id, message.From.Id);
                         else
                             await _client.SendTextMessageAsync(chat.Id, "Ваша подписка на бота закончилась! Чтобы снова начать пользоваться функциями бота произведите оплату...");
-                        return;
+                        break;
+                    case UpdateType.PreCheckoutQuery:
+                        await _client.AnswerPreCheckoutQueryAsync(update.PreCheckoutQuery.Id);
+                        break;
                 }
             }
             catch (Exception ex)

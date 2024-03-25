@@ -104,13 +104,13 @@ namespace OracleDotoBot.Services
 
         private string GetBriefLaningStatisticsString(LaningStatistics stats)
         {
-            var statistics = "\n*Лейнинг: *\n";
+            var statistics = "\n\n*Лейнинг: *\n";
 
             statistics += GetBriefLaneResult(stats.Mid, "*миде*") + "\n";
 
             statistics += GetBriefLaneResult(stats.EasyLane, "*боте*") + "\n";
 
-            statistics += GetBriefLaneResult(stats.HardLane, "*топе*") + "\n";
+            statistics += GetBriefLaneResult(stats.HardLane, "*топе*");
 
             return statistics;
         }
@@ -159,12 +159,14 @@ namespace OracleDotoBot.Services
                     {
                         heroStats += "\nКоличество матчей игрока на герое: " + p.TotalMatchCount;
                         if (p.TotalMatchCount > 0)
-                            heroStats += "\nВинрейт игрока на герое: " 
+                            heroStats += "\nВинрейт игрока на герое: "
                                 + Math.Round((double)p.WinMatchCount / p.TotalMatchCount * 100, 2) + "%\n";
                         else
                             heroStats += "\n";
                     }
                 }
+                else
+                    heroStats += "\n";
                 statistics += heroStats;
             }
             return statistics;

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using OracleDotoBot.Abstractions.Services;
+﻿using OracleDotoBot.Abstractions.Services;
 using OracleDotoBot.Domain.Models;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -8,12 +7,10 @@ namespace OracleDotoBot.Services
     public class LiveMatchesService : ILiveMatchesService
     {
         public LiveMatchesService(ISteamApiService steamApiService, 
-            IMatchesResultService matchesResultService,
-            ILogger<LiveMatchesService> logger)
+            IMatchesResultService matchesResultService)
         {
             _steamApiService = steamApiService;
             _matchesResultService = matchesResultService;
-            _logger = logger;
             LiveMatches = new List<(Match match, string analitics)>();
         }
 
@@ -21,7 +18,6 @@ namespace OracleDotoBot.Services
 
         private readonly ISteamApiService _steamApiService;
         private readonly IMatchesResultService _matchesResultService;
-        private readonly ILogger<LiveMatchesService> _logger;
 
         public async Task UpdateLiveMatches()
         {

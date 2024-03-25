@@ -44,7 +44,7 @@ namespace OracleDotoBot.DAL.Repositories
             return user;
         }
 
-        public async Task Update(long id, DateTime subscriptionEndTime)
+        public async Task UpdateSubscription(long id, DateTime subscriptionEndTime)
         {
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == id);
