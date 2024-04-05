@@ -6,6 +6,8 @@ namespace OracleDotoBot.Abstractions.Services
     {
         List<User> Users { get; set; }
 
+        List<string> VipUsers { get; set; }
+
         Task<bool> CheckSubscription(long id);
 
         Task UpdateActiveUsersList();
@@ -13,5 +15,7 @@ namespace OracleDotoBot.Abstractions.Services
         Task<string> GetSubscriptionPeriod(long id);
 
         Task<string> UpdateSubscription(int daysCount, long id);
+
+        Task<int> GetTotalUserCount();
     }
 }

@@ -313,7 +313,7 @@ namespace OracleDotoBot.StratzApiParser.Api
             string query = $@"
                 {{
 	                player (steamAccountId : { steamId }) {{
-		                heroPerformance (heroId : { heroId }  request : {{ isLeague : true take : 100 }}) {{
+		                heroPerformance (heroId : { heroId }  request : {{ isLeague : true take : 20 }}) {{
                       winCount
                       matchCount
                     }}

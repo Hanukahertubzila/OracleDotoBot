@@ -8,6 +8,8 @@ namespace OracleDotoBot.SteamApi.Converters
     {
         public static List<Match> Convert(LiveMatchesResponse response, List<Hero> heroes)
         {
+            if (response.GameList == null)
+                return new List<Match>();
             var matches = response.GameList
                 .Where(m => !string.IsNullOrEmpty(m.RadiantName) &&
                 !string.IsNullOrEmpty(m.DireName) && m.Players.Count == 10).ToList();
@@ -116,6 +118,7 @@ namespace OracleDotoBot.SteamApi.Converters
                 };
                 var match = new Match()
                 {
+                    Id = m.Id,
                     RadiantTeam = radiantTeam,
                     DireTeam = direTeam,
                     HeroIds = heroIds

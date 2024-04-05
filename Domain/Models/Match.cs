@@ -2,6 +2,8 @@
 {
     public class Match
     {
+        public long Id { get ; set; }
+
         public Team RadiantTeam { get; set; } = new Team();
 
         public Team DireTeam { get; set; } = new Team();

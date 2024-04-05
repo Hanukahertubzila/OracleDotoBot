@@ -15,14 +15,12 @@ namespace OracleDotoBot.Services
             IMatchesResultService matchesResultService,
             ILiveMatchesService liveMatchesService,
             ITelegramBotClient client,
-            IConfiguration configuration,
             IUsersService usersService)
         {
             _heroes = heroes;
             _matchesResultService = matchesResultService;
             _liveMatchesService = liveMatchesService;
             _client = client;
-            _configuration = configuration;
             _userService = usersService;
         }
 
@@ -30,10 +28,9 @@ namespace OracleDotoBot.Services
         private readonly IMatchesResultService _matchesResultService;
         private readonly ILiveMatchesService _liveMatchesService;
         private readonly ITelegramBotClient _client;
-        private readonly IConfiguration _configuration;
         private readonly IUsersService _userService;
 
-        public async Task GetResponse(string messageText, long chatId, long userId)
+        public async Task GetResponse(string messageText, long chatId, long userId, string userName)
         {
             var responseText = "";
             var replyKeyboard = new ReplyKeyboardMarkup(
@@ -46,8 +43,8 @@ namespace OracleDotoBot.Services
                 },
                 new KeyboardButton[]
                 {
-                    new KeyboardButton("Статистика бота"),
-                    new KeyboardButton("Подписка")
+                    new KeyboardButton("Подписка"),
+                    new KeyboardButton("Статистика бота")
                 },
                 new KeyboardButton[]
                 {
@@ -59,16 +56,43 @@ namespace OracleDotoBot.Services
             };
 
             // add X days to XXX
-            if (messageText.Contains("days") && _userService.Users.First(u => u.Id == userId).Role == DAL.Enums.Roles.Admin)
+            // get users count
+            // 17579317059
+            if (_userService.Users.First(u => u.Id == userId).Role == DAL.Enums.Roles.Admin)
             {
-                var m = messageText.Split(' ');
-                if (m.Length > 4)
+                if (messageText.Contains("days"))
                 {
-                    var daysCount = int.Parse(m[1]);
-                    var id = long.Parse(m[4]);
-                    await _userService.UpdateSubscription(daysCount, id);
-                    await _client.SendTextMessageAsync(chatId, $"{id} подписка была продлена на {daysCount} дней", replyMarkup: replyKeyboard, parseMode: ParseMode.Markdown);
+                    var m = messageText.Split(' ');
+                    if (m.Length > 4)
+                    {
+                        var daysCount = int.Parse(m[1]);
+                        var id = long.Parse(m[4]);
+                        await _userService.UpdateSubscription(daysCount, id);
+                        await _client.SendTextMessageAsync(chatId, $"{id} подписка была продлена на {daysCount} дней", replyMarkup: replyKeyboard, parseMode: ParseMode.Markdown);
+                        return;
+                    }
+                }
+                else if (messageText == "get users count")
+                {
+                    var count = await _userService.GetTotalUserCount();
+                    await _client.SendTextMessageAsync(chatId, $"Общее число пользователей: {count}", replyMarkup: replyKeyboard, parseMode: ParseMode.Markdown);
                     return;
+                }
+                else if (messageText.Contains("add vip") && messageText.Split(' ').Length > 2)
+                {
+                    _userService.VipUsers.Add(messageText.Split(' ')[2]);
+                    await _client.SendTextMessageAsync(chatId, "Vip добавлен");
+                    return;
+                }
+                else
+                {
+                    long id = 0;
+                    if (long.TryParse(messageText, out id))
+                    {
+                        await _client.SendTextMessageAsync(chatId, "Готовим аналитику...");
+                        await _client.SendTextMessageAsync(chatId, await _matchesResultService.GetMatchResultById(id), replyMarkup: replyKeyboard, parseMode: ParseMode.Markdown);
+                        return;
+                    }
                 }
             }
 
@@ -77,15 +101,19 @@ namespace OracleDotoBot.Services
                 case "/start":
                     responseText = @"Привет лудик! 
 ВАЖНО ПРОЧИТАТЬ: 
-Бот служит помощником в анализе драфта, и хотя я не учил его проигрывать, никаких 100% результатов он не дает, внимательно читай аналитику и принимай решение сам, основываясь на цифрах. Оценка драфта и формирование результатов может занять некоторое время... 
+Бот служит помощником в анализе драфта, и хотя я не учил его проигрывать, никаких 100% результатов он не дает, внимательно читай аналитику и принимай решение сам, основываясь на статистике. Оценка драфта и формирование результатов может занять некоторое время... 
 удачи <3";
+                    await _client.SendTextMessageAsync(chatId, responseText);
+                    responseText = "Если вы используете бота впервые, у вас есть 2 бесплатных дня аналитики, по их прошествию, если вы захотите дальше пользоваться ботом, вам придется купить подписку";
                     break;
                 case "Помощь":
                     responseText = $@"
 *ЛАЙВ МАТЧИ* - список актуальных матчей с аналитикой
 *ВВЕСТИ ГЕРОЕВ* - чтобы получить анализ по драфту, введи имена персонажей по их позиции и команде (имена нужно вводить без ошибок на английском как они записаны в самой доте)
 *СТАТИСТИКА* - статистика бота за определенный период/турнир (собирается только на турнирах 1/2 дивизионов)
-*ПОДПИСКА* - проверить дату окончания текущей подписки или оплатить новую";
+*ПОДПИСКА* - проверить дату окончания текущей подписки или оплатить новую
+
+В случае технических проблем пишите: @Hanukahertubzila";
                     break;
                 case "Ввести героев":
                     _matchesResultService.NewMatch(chatId);
@@ -100,6 +128,11 @@ namespace OracleDotoBot.Services
 https://t.me/WiseOracleIsHere";
                     break;
                 case "Подписка":
+                    if (_userService.VipUsers.Contains(userName))
+                    {
+                        responseText = "У вас неограниченная подписка на бота";
+                        break;
+                    }
                     responseText = await _userService.GetSubscriptionPeriod(userId);
                     replyKeyboard = new ReplyKeyboardMarkup(
                 new List<KeyboardButton[]>()
@@ -114,7 +147,7 @@ https://t.me/WiseOracleIsHere";
                 },
                 new KeyboardButton[]
                 {
-                    new KeyboardButton("Продлить на месяц: 699₽")
+                    new KeyboardButton("Продлить на месяц: 599₽")
                 },
                 new KeyboardButton[]
                 {
@@ -128,14 +161,17 @@ https://t.me/WiseOracleIsHere";
                 case "Назад":
                     responseText = "Меню: ";
                     break;
+                case "no match":
+                    responseText = "Нет матча...";
+                    break;
                 case "Продлить на неделю: 249₽":
-                    await _client.SendInvoiceAsync(chatId, "Оплата подписки", "Продлить подписку на неделю", "7", "1744374395:TEST:cee68c72e453188fd521", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 24900) });
+                    await _client.SendInvoiceAsync(chatId, "Оплата подписки на 7 дней", "Продлить подписку на неделю (возможность пользоваться ботом 7 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", "7", "390540012:LIVE:48849", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 24900) });
                     return;
                 case "Продлить на две недели: 399₽":
-                    await _client.SendInvoiceAsync(chatId, "Оплата подписки", "Продлить подписку на две недели", "14", "1744374395:TEST:cee68c72e453188fd521", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 39900) });
+                    await _client.SendInvoiceAsync(chatId, "Оплата подписки на 14 дней", "Продлить подписку на две недели (возможность пользоваться ботом 14 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", "14", "390540012:LIVE:48849", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 39900) });
                     return;
-                case "Продлить на месяц: 699₽":
-                    await _client.SendInvoiceAsync(chatId, "Оплата подписки", "Продлить подписку на месяц", "30", "1744374395:TEST:cee68c72e453188fd521", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 69900) });
+                case "Продлить на месяц: 599₽":
+                    await _client.SendInvoiceAsync(chatId, "Оплата подписки на 30 дней", "Продлить подписку на месяц (возможность пользоваться ботом 30 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", "30", "390540012:LIVE:48849", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 59900) });
                     return;
                 case "get my id":
                     responseText = userId.ToString();
@@ -156,20 +192,15 @@ https://t.me/WiseOracleIsHere";
                         replyKeyboard = null;
                         break;
                     }
+                    var messageMatch = messageText.Replace(" ", string.Empty);
 
                     var matchCommand = _liveMatchesService.LiveMatches
-                        .FirstOrDefault(m => $"{ m.match.RadiantTeam.Name } VS { m.match.DireTeam.Name }" == messageText);
+                        .FirstOrDefault(m => messageMatch.Contains(m.match.RadiantTeam.Name.Replace(" ", string.Empty)) && 
+                        messageMatch.Contains(m.match.DireTeam.Name.Replace(" ", string.Empty)));
                     if (matchCommand.match != null)
                     {
                         await _client.SendTextMessageAsync(chatId, "Готовим аналитику...");
                         responseText = matchCommand.analitics;
-                        break;
-                    }
-                    long id = 0;
-                    if (long.TryParse(messageText, out id))
-                    {
-                        await _client.SendTextMessageAsync(chatId, "Готовим аналитику...");
-                        responseText = await _matchesResultService.GetMatchResultById(id);
                         break;
                     }
                     responseText = "Неизвестная команда...";

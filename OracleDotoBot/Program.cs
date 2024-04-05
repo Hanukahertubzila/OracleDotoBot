@@ -91,8 +91,14 @@ public class Program
             .UseSerilog()
             .Build();
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
-        await host.RunAsync();
+        try
+        {
+            await host.RunAsync();
+        }
+        catch(Exception ex)
+        {
+            Log.Logger.Error(ex.ToString());
+        }
     }
 
     private static void BuildConfig(IConfigurationBuilder builder)

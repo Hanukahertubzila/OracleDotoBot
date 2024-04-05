@@ -32,7 +32,10 @@ namespace OracleDotoBot.Services
             if (includeMatchUp)
             {
                 matchups = await _stratzApiService.GetMatchupStatistics(match);
-                analitics += GetBriefMatchupStatisticsString(matchups, match);
+                analitics += includePlayerPerformance ? 
+                    GetBriefMatchupStatisticsString(matchups, match, playerPerformance) :
+                    GetBriefMatchupStatisticsString(matchups, match);
+
             }
             if (includeLaning)
             {
@@ -51,7 +54,8 @@ namespace OracleDotoBot.Services
             return analitics;
         }
 
-        private string GetBriefMatchupStatisticsString(List<HeroStatistics> stats, Match match)
+        private string GetBriefMatchupStatisticsString(List<HeroStatistics> stats, Match match, 
+            List<PlayerPerformance>? playerPerformances = default)
         {
             var radiantWinrate = Math.Round(stats
                 .Select(h => h.WinRate)
@@ -82,11 +86,40 @@ namespace OracleDotoBot.Services
 
             var radiantPower = radiantWinrate / 2 + radiantMatchupWithWinrate + radiantMatchupVsWinrate;
             var direPower = direWinrate / 2 + direMatchupWithWinrate + direMatchupVsWinrate;
+            if (playerPerformances != default && playerPerformances.Count > 0)
+            {
+                double radiantPerformance = 0;
+                int radiantPerformanceCount = 0;
+                double direPerformance = 0;
+                int direPerformanceCount = 0;
+                for (int i = 0; i < match.HeroIds.Count; i++)
+                {
+                    var performance = playerPerformances.First(p => p.HeroId == match.HeroIds[i]);
+                    if (performance.TotalMatchCount > 5)
+                    {
+                        if (i < 5)
+                        {
+                            radiantPerformance += (double)performance.WinMatchCount / performance.TotalMatchCount * 100;
+                            radiantPerformanceCount += 1;
+                        }
+                        else
+                        {
+                            direPerformance += (double)performance.WinMatchCount / performance.TotalMatchCount * 100;
+                            direPerformanceCount += 1;
+                        }
+                    }
+                }
+                if (radiantPerformanceCount > 3 && direPerformanceCount > 3)
+                {
+                    radiantPower += radiantPerformance / radiantPerformanceCount * 0.5d;
+                    direPower += direPerformance / direPerformanceCount * 0.5d;
+                }
+            }
 
             var strongerDraft = string.Empty;
             if (!string.IsNullOrEmpty(match.RadiantTeam.Name) && !string.IsNullOrEmpty(match.DireTeam.Name))
-                strongerDraft = radiantPower > direPower ? $"{match.RadiantTeam.Name} (свет) " 
-                    : $"{match.DireTeam.Name} (тьма) ";
+                strongerDraft = radiantPower > direPower ? $"{match.RadiantTeam.Name} (свет)" 
+                    : $"{match.DireTeam.Name} (тьма)";
             else
                 strongerDraft = radiantPower > direPower ? "СВЕТА" : "ТЬМЫ";
 
@@ -98,7 +131,6 @@ namespace OracleDotoBot.Services
 *Свет: *{radiantMatchupVsWinrate}% *Тьма: *{direMatchupVsWinrate}%;
 *Синергия драфта: *
 *Свет: *{radiantMatchupWithWinrate}% *Тьма: *{direMatchupWithWinrate}%;";
-
             return statistics;
         }
 

@@ -10,6 +10,9 @@ namespace OracleDotoBot.SteamApi.ResponseObjectModels
 
     public class GameResponse
     {
+        [JsonProperty("match_id")]
+        public long Id { get; set; }
+
         [JsonProperty("team_name_radiant")]
         public string RadiantName { get; set; } = string.Empty;
 

@@ -26,7 +26,8 @@ namespace OracleDotoBot.Services
                 _logger.LogError(matches.error);
                 return new List<Match>();
             }
-
+            if (matches.data.Count > 7)
+                return matches.data.Take(7).ToList();
             return matches.data;
         }
     }

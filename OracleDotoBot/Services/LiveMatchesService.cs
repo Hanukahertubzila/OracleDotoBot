@@ -1,4 +1,5 @@
-﻿using OracleDotoBot.Abstractions.Services;
+﻿using Microsoft.Extensions.Logging;
+using OracleDotoBot.Abstractions.Services;
 using OracleDotoBot.Domain.Models;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -7,10 +8,12 @@ namespace OracleDotoBot.Services
     public class LiveMatchesService : ILiveMatchesService
     {
         public LiveMatchesService(ISteamApiService steamApiService, 
-            IMatchesResultService matchesResultService)
+            IMatchesResultService matchesResultService,
+            ILogger<LiveMatchesService> logger)
         {
             _steamApiService = steamApiService;
             _matchesResultService = matchesResultService;
+            _logger = logger;
             LiveMatches = new List<(Match match, string analitics)>();
         }
 
@@ -18,19 +21,27 @@ namespace OracleDotoBot.Services
 
         private readonly ISteamApiService _steamApiService;
         private readonly IMatchesResultService _matchesResultService;
+        private readonly ILogger<LiveMatchesService> _logger;
 
         public async Task UpdateLiveMatches()
         {
             var matches = await _steamApiService.GetLiveMatches();
 
             var liveMatches = new List<(Match match, string analitics)>();
-
+            var updatedMatches = 0;
             foreach (var m in matches)
             {
-                var analitics = await _matchesResultService.GetMatchResult(m, false, true);
-                liveMatches.Add((m, analitics));
+                var liveMatch = LiveMatches.FirstOrDefault(l => l.match.Id == m.Id);
+                if (liveMatch != default)
+                    liveMatches.Add((m, liveMatch.analitics));
+                else
+                {
+                    var analitics = await _matchesResultService.GetMatchResult(m, false, true);
+                    liveMatches.Add((m, analitics));
+                    updatedMatches += 1;
+                }
             }
-
+            _logger.LogInformation($"Live matches: {liveMatches.Count}; Updated matches: {updatedMatches}");
             LiveMatches = liveMatches;
         }
 

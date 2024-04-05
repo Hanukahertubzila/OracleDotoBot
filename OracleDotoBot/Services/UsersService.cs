@@ -9,10 +9,13 @@ namespace OracleDotoBot.Services
         public UsersService(UsersRepository usersRepository)
         {
             Users = new List<User>();
+            VipUsers = new List<string>();
             _usersRepository = usersRepository;
         }
 
         public List<User> Users { get; set; }
+
+        public List<string> VipUsers { get; set; }
 
         private readonly UsersRepository _usersRepository;
 
@@ -40,7 +43,7 @@ namespace OracleDotoBot.Services
             if (user != null)
                 return user.SubscriptionEndTime > DateTime.Now;
 
-            user = await _usersRepository.Add(id, DateTime.Now.AddDays(0), DAL.Enums.Roles.User);
+            user = await _usersRepository.Add(id, DateTime.Now.AddDays(2), DAL.Enums.Roles.User);
             Users.Add(user);
 
             return true;
@@ -57,6 +60,13 @@ namespace OracleDotoBot.Services
             if (user.SubscriptionEndTime < DateTime.Now)
                 return "Ваша подписка закончилась...";
             return $"Ваша подписка продлится до {user.SubscriptionEndTime.AddHours(3).ToString("dd.MM.yy H:mm")} по Мск";
+        }
+
+        public async Task<int> GetTotalUserCount()
+        {
+            var count = await _usersRepository.GetTotalUserCount();
+
+            return count;
         }
 
         public async Task<string> UpdateSubscription(int daysCount, long id)

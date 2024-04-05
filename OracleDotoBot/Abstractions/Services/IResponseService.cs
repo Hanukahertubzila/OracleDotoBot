@@ -4,6 +4,6 @@ namespace OracleDotoBot.Abstractions.Services
 {
     public interface IResponseService
     {
-        Task GetResponse(string messageText, long chatId, long userId);
+        Task GetResponse(string messageText, long chatId, long userId, string userName);
     }
 }

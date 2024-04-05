@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OracleDotoBot.Abstractions.Services;
 using Telegram.Bot;
@@ -51,11 +50,11 @@ namespace OracleDotoBot.Services
             await _usersService.UpdateActiveUsersList();
             await _liveMatchesService.UpdateLiveMatches();
 
-            var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
+            var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
 
-            while (await timer.WaitForNextTickAsync())
+            while (await timer.WaitForNextTickAsync() && !Console.KeyAvailable)
                 await _liveMatchesService.UpdateLiveMatches();
-            Console.ReadLine();
+            
             cts.Cancel();
         }
 
@@ -81,8 +80,8 @@ namespace OracleDotoBot.Services
                                 },
                                 new KeyboardButton[]
                                 {
-                                    new KeyboardButton("Статистика бота"),
-                                    new KeyboardButton("Подписка")
+                                    new KeyboardButton("Подписка"),
+                                    new KeyboardButton("Статистика бота")
                                 },
                                 new KeyboardButton[]
                                 {
@@ -96,8 +95,18 @@ namespace OracleDotoBot.Services
                             await _client.SendTextMessageAsync(chat.Id, subscriptionResponse, replyMarkup: replyKeyboard);
                             break;
                         }
-                        if (await _usersService.CheckSubscription(message.From.Id))
-                            await _responseService.GetResponse(message.Text, chat.Id, message.From.Id);
+                        var unsubCommands = new List<string>()
+                        {
+                            "Подписка",
+                            "Назад",
+                            "get my id",
+                            "Продлить на неделю: 249₽",
+                            "Продлить на две недели: 399₽",
+                            "Продлить на месяц: 699₽"
+                        };
+                        if (await _usersService.CheckSubscription(message.From.Id) || unsubCommands.Contains(message.Text)
+                            || _usersService.VipUsers.Contains(message.From.FirstName))
+                            await _responseService.GetResponse(message.Text, chat.Id, message.From.Id, message.From.Username);
                         else
                             await _client.SendTextMessageAsync(chat.Id, "Ваша подписка на бота закончилась! Чтобы снова начать пользоваться функциями бота произведите оплату...");
                         break;

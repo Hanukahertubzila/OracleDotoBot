@@ -37,6 +37,7 @@ namespace OracleDotoBot.Services
         public async Task<string> GetMatchResult(Match match, bool includeLaning, bool includePlayerPerformance)
         {
             var result = await _matchAnaliticsService.GetMatchAnalitics(match, true, includeLaning, includePlayerPerformance);
+
             return result;
         }
 

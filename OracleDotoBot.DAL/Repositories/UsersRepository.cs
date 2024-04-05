@@ -30,6 +30,13 @@ namespace OracleDotoBot.DAL.Repositories
             return user;
         }
 
+        public async Task<int> GetTotalUserCount()
+        {
+            var count = await _context.Users.CountAsync();
+
+            return count;
+        }
+
         public async Task<User> Add(long id, DateTime subscritptionEndTime, Roles role)
         {
             var user = new User()
