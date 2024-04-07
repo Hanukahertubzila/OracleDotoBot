@@ -22,6 +22,7 @@ namespace OracleDotoBot.Services
         private readonly ISteamApiService _steamApiService;
         private readonly IMatchesResultService _matchesResultService;
         private readonly ILogger<LiveMatchesService> _logger;
+        private int zeroMatchesCount = 0;
 
         public async Task UpdateLiveMatches()
         {
@@ -29,18 +30,25 @@ namespace OracleDotoBot.Services
 
             var liveMatches = new List<(Match match, string analitics)>();
             var updatedMatches = 0;
-            foreach (var m in matches)
+
+            zeroMatchesCount = matches.Count == 0 ? zeroMatchesCount + 1 : 0;
+
+            if (matches.Count > 0 || zeroMatchesCount > 5)
             {
-                var liveMatch = LiveMatches.FirstOrDefault(l => l.match.Id == m.Id);
-                if (liveMatch != default)
-                    liveMatches.Add((m, liveMatch.analitics));
-                else
+                foreach (var m in matches)
                 {
-                    var analitics = await _matchesResultService.GetMatchResult(m, false, true);
-                    liveMatches.Add((m, analitics));
-                    updatedMatches += 1;
+                    var liveMatch = LiveMatches.FirstOrDefault(l => l.match.Id == m.Id);
+                    if (liveMatch != default)
+                        liveMatches.Add((m, liveMatch.analitics));
+                    else
+                    {
+                        var analitics = await _matchesResultService.GetMatchResult(m, false, true);
+                        liveMatches.Add((m, analitics));
+                        updatedMatches += 1;
+                    }
                 }
             }
+
             _logger.LogInformation($"Live matches: {liveMatches.Count}; Updated matches: {updatedMatches}");
             LiveMatches = liveMatches;
         }

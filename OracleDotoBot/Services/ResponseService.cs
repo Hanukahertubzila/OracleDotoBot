@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using OracleDotoBot.Abstractions.Services;
 using OracleDotoBot.Models;
 using Telegram.Bot;
@@ -165,13 +166,34 @@ https://t.me/WiseOracleIsHere";
                     responseText = "Нет матча...";
                     break;
                 case "Продлить на неделю: 249₽":
-                    await _client.SendInvoiceAsync(chatId, "Оплата подписки на 7 дней", "Продлить подписку на неделю (возможность пользоваться ботом 7 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", "7", "390540012:LIVE:48849", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 24900) });
+                    var providerData = "{\r\n    \"receipt\": {\r\n        \"items\": [{\r\n            \"description\": \"Оплата подписки на 7 дней\",\r\n            \"quantity\": \"1.00\",\r\n            \"amount\": {\r\n                \"value\": \"249.00\",\r\n                \"currency\": \"RUB\"\r\n            },\r\n            \"vat_code\": 1\r\n        }]\r\n    }\r\n}";
+                    await _client.SendInvoiceAsync(chatId, 
+                        "Оплата подписки на 7 дней", 
+                        "Продлить подписку на неделю (возможность пользоваться ботом 7 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", 
+                        "7", "390540012:LIVE:48849", "RUB", 
+                        new List<LabeledPrice>() { new LabeledPrice("Руб", 24900) }, 
+                        needEmail: true, sendEmailToProvider: true,
+                        providerData: providerData);
                     return;
                 case "Продлить на две недели: 399₽":
-                    await _client.SendInvoiceAsync(chatId, "Оплата подписки на 14 дней", "Продлить подписку на две недели (возможность пользоваться ботом 14 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", "14", "390540012:LIVE:48849", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 39900) });
+                    providerData = "{\r\n    \"receipt\": {\r\n        \"items\": [{\r\n            \"description\": \"Оплата подписки на 14 дней\",\r\n            \"quantity\": \"1.00\",\r\n            \"amount\": {\r\n                \"value\": \"399.00\",\r\n                \"currency\": \"RUB\"\r\n            },\r\n            \"vat_code\": 1\r\n        }]\r\n    }\r\n}";
+                    await _client.SendInvoiceAsync(chatId, 
+                        "Оплата подписки на 14 дней", 
+                        "Продлить подписку на две недели (возможность пользоваться ботом 14 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", 
+                        "14", "390540012:LIVE:48849", "RUB", 
+                        new List<LabeledPrice>() { new LabeledPrice("Руб", 39900) }, 
+                        needEmail: true, sendEmailToProvider: true,
+                        providerData: providerData);
                     return;
                 case "Продлить на месяц: 599₽":
-                    await _client.SendInvoiceAsync(chatId, "Оплата подписки на 30 дней", "Продлить подписку на месяц (возможность пользоваться ботом 30 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", "30", "390540012:LIVE:48849", "RUB", new List<LabeledPrice>() { new LabeledPrice("Руб", 59900) });
+                    providerData = "{\r\n    \"receipt\": {\r\n        \"items\": [{\r\n            \"description\": \"Оплата подписки на 30 дней\",\r\n            \"quantity\": \"1.00\",\r\n            \"amount\": {\r\n                \"value\": \"599.00\",\r\n                \"currency\": \"RUB\"\r\n            },\r\n            \"vat_code\": 1\r\n        }]\r\n    }\r\n}";
+                    await _client.SendInvoiceAsync(chatId, 
+                        "Оплата подписки на 30 дней", 
+                        "Продлить подписку на месяц (возможность пользоваться ботом 30 дней, если ваша текущая подписка еще не закончилась, время будет продлено)", 
+                        "30", "390540012:LIVE:48849", "RUB", 
+                        new List<LabeledPrice>() { new LabeledPrice("Руб", 59900) }, 
+                        needEmail: true, sendEmailToProvider: true,
+                        providerData: providerData);
                     return;
                 case "get my id":
                     responseText = userId.ToString();
