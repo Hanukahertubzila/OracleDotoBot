@@ -94,8 +94,8 @@ namespace OracleDotoBot.Services
                 int direPerformanceCount = 0;
                 for (int i = 0; i < match.HeroIds.Count; i++)
                 {
-                    var performance = playerPerformances.First(p => p.HeroId == match.HeroIds[i]);
-                    if (performance.TotalMatchCount > 5)
+                    var performance = playerPerformances.FirstOrDefault(p => p.HeroId == match.HeroIds[i]);
+                    if (performance != null && performance.TotalMatchCount > 5)
                     {
                         if (i < 5)
                         {

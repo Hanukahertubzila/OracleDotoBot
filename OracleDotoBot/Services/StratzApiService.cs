@@ -22,41 +22,73 @@ namespace OracleDotoBot.Services
 
         public async Task<Match?> GetMatchById(long id)
         {
-            var match = await _apiClient.GetMatchById(id);
-            return match.match;
+            try
+            {
+                var match = await _apiClient.GetMatchById(id);
+                return match.match;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return null;
+            }
         }
 
         public async Task<List<PlayerPerformance>> GetPlayerPerformance(Match match)
         {
-            var matchWithPerformance = await _apiClient.GetPlayerHeroPerformance(match);
-            if (!string.IsNullOrEmpty(matchWithPerformance.error))
+            try
             {
-                _logger.LogError(matchWithPerformance.error);
+                var matchWithPerformance = await _apiClient.GetPlayerHeroPerformance(match);
+                if (!string.IsNullOrEmpty(matchWithPerformance.error))
+                {
+                    _logger.LogError(matchWithPerformance.error);
+                    return matchWithPerformance.match;
+                }
                 return matchWithPerformance.match;
             }
-            return matchWithPerformance.match;
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return new List<PlayerPerformance>();
+            }
         }
 
         public async Task<List<HeroStatistics>> GetMatchupStatistics(Match match)
         {
-            var stats = await _apiClient.GetMatchUpStatistics(match);
-            if (!string.IsNullOrEmpty(stats.error))
+            try
             {
-                _logger.LogError(stats.error);
+                var stats = await _apiClient.GetMatchUpStatistics(match);
+                if (!string.IsNullOrEmpty(stats.error))
+                {
+                    _logger.LogError(stats.error);
+                    return new List<HeroStatistics>();
+                }
+                return stats.stats;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
                 return new List<HeroStatistics>();
             }
-            return stats.stats;
         }
 
         public async Task<LaningStatistics?> GetLaningStatistics(Match match)
         {
-            var laning = await _apiClient.GetLaningStatistics(match);
-            if (!string.IsNullOrEmpty(laning.error))
+            try
             {
-                _logger.LogError(laning.error);
+                var laning = await _apiClient.GetLaningStatistics(match);
+                if (!string.IsNullOrEmpty(laning.error))
+                {
+                    _logger.LogError(laning.error);
+                    return null;
+                }
+                return laning.stats;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
                 return null;
             }
-            return laning.stats;
         }
     }
 }

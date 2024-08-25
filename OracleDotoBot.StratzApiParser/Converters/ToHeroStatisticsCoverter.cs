@@ -11,6 +11,8 @@ namespace OracleDotoBot.StratzApiParser.Parsers
             var stats = new List<HeroStatistics>();
             var radiantTeam = match.HeroIds.Take(match.HeroIds.Count / 2).ToList();
             var direTeam = match.HeroIds.Skip(match.HeroIds.Count / 2).ToList();
+            if (radiantTeam.Count < 5 || direTeam.Count < 5)
+                return null;
             GetStatsByTeam(response.Data.Stats, 
                 radiantTeam, 
                 direTeam, 

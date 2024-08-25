@@ -19,16 +19,24 @@ namespace OracleDotoBot.Services
 
         public async Task<List<Match>> GetLiveMatches()
         {
-            var matches = await _client.GetLiveMatches();
-
-            if (!string.IsNullOrEmpty(matches.error))
+            try
             {
-                _logger.LogError(matches.error);
+                var matches = await _client.GetLiveMatches();
+
+                if (!string.IsNullOrEmpty(matches.error))
+                {
+                    _logger.LogError(matches.error);
+                    return new List<Match>();
+                }
+                if (matches.data.Count > 7)
+                    return matches.data.Take(7).ToList();
+                return matches.data;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
                 return new List<Match>();
             }
-            if (matches.data.Count > 7)
-                return matches.data.Take(7).ToList();
-            return matches.data;
         }
     }
 }

@@ -59,7 +59,7 @@ namespace OracleDotoBot.Services
             // add X days to XXX
             // get users count
             // 17579317059
-            if (_userService.Users.First(u => u.Id == userId).Role == DAL.Enums.Roles.Admin)
+            if (_userService.Users.FirstOrDefault(u => u.Id == userId)?.Role == DAL.Enums.Roles.Admin)
             {
                 if (messageText.Contains("days"))
                 {
